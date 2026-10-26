@@ -236,6 +236,45 @@
     return li;
   }
 
+  /* Baris kategori: tombol panah, roda mouse, dan seret supaya mudah digeser di laptop/komputer (di HP cukup usap). */
+  function bungkusChip(chips) {
+    var kiri = h("button", { type: "button", class: "chip-geser", "aria-label": "Geser kategori ke kiri", tabindex: "-1" }, ikon("back", 18));
+    var kanan = h("button", { type: "button", class: "chip-geser", "aria-label": "Geser kategori ke kanan", tabindex: "-1" }, ikon("arrow", 18));
+    var bungkus = h("div", { class: "chip-bungkus" }, kiri, chips, kanan);
+    function perbarui() {
+      var maks = chips.scrollWidth - chips.clientWidth;
+      bungkus.classList.toggle("bisa-geser", maks > 4);
+      kiri.disabled = chips.scrollLeft <= 2;
+      kanan.disabled = chips.scrollLeft >= maks - 2;
+    }
+    function geserBy(arah) { chips.scrollBy({ left: arah * Math.max(160, chips.clientWidth * 0.7), behavior: u.kurangGerak() ? "auto" : "smooth" }); }
+    kiri.addEventListener("click", function () { geserBy(-1); });
+    kanan.addEventListener("click", function () { geserBy(1); });
+    chips.addEventListener("scroll", perbarui, { passive: true });
+    window.addEventListener("resize", perbarui);
+    new MutationObserver(function () { perbarui(); }).observe(chips, { childList: true });
+    chips.addEventListener("wheel", function (e) {
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+      var maks = chips.scrollWidth - chips.clientWidth;
+      if (maks <= 4) return;
+      var ujung = (e.deltaY < 0 && chips.scrollLeft <= 0) || (e.deltaY > 0 && chips.scrollLeft >= maks - 1);
+      if (ujung) return; /* di ujung baris, biarkan halaman yang menggulir */
+      chips.scrollLeft += e.deltaY; e.preventDefault();
+    }, { passive: false });
+    var awal = null, geserJauh = false;
+    chips.addEventListener("pointerdown", function (e) { if (e.pointerType === "mouse" && e.button === 0) { awal = { x: e.clientX, kiri: chips.scrollLeft }; geserJauh = false; } });
+    window.addEventListener("pointermove", function (e) {
+      if (!awal) return;
+      var dx = e.clientX - awal.x;
+      if (Math.abs(dx) > 5) { geserJauh = true; chips.classList.add("diseret"); }
+      if (geserJauh) chips.scrollLeft = awal.kiri - dx;
+    });
+    window.addEventListener("pointerup", function () { awal = null; setTimeout(function () { chips.classList.remove("diseret"); }, 0); });
+    chips.addEventListener("click", function (e) { if (geserJauh) { e.stopPropagation(); e.preventDefault(); geserJauh = false; } }, true);
+    setTimeout(perbarui, 0);
+    return bungkus;
+  }
+
   function renderGame(g) {
     document.title = "Harga joki " + g.nama + " | " + C.NAMA_TOKO;
     tautanBalik.hidden = false;
@@ -258,7 +297,7 @@
     var alat = h("div", { class: "alat" },
       h("div", { class: "wadah alat-isi", style: "padding-inline:clamp(16px,4vw,40px)" },
         h("div", { class: "cari" }, ikon("search", 20), input),
-        chips
+        bungkusChip(chips)
       )
     );
 
@@ -314,6 +353,8 @@
           h("p", { text: k ? "Coba kata lain, atau hapus pencarian untuk melihat semua paket." : "Daftar harga game ini belum diisi." })
         ));
       }
+      var aktifChip = chips.querySelector('[aria-pressed="true"]');
+      if (aktifChip) chips.scrollLeft = Math.max(0, aktifChip.offsetLeft - (chips.clientWidth - aktifChip.offsetWidth) / 2);
       info.textContent = k ? total + " paket ditemukan." : "";
       if (k) pasangPengamat(); else if (pengamat) { pengamat.disconnect(); pengamat = null; }
       pasangMuncul(Array.prototype.slice.call(wadahBlok.querySelectorAll(".blok")));

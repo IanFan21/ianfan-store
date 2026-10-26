@@ -238,3 +238,17 @@ html { scrollbar-color: #2a3470 var(--ink); scrollbar-width: thin; accent-color:
 .termasuk { margin-top: 6px; padding: 10px 12px; border-radius: 12px; background: rgba(255, 255, 255, .04); color: var(--teks-d); }
 .item-aksi + .termasuk { margin-top: 8px; }
 .menu .titik { border-bottom-style: dotted; }
+
+/* ---------- Baris kategori: mudah digeser di komputer ---------- */
+.chip-bungkus { position: relative; display: flex; align-items: center; gap: 6px; min-width: 0; }
+.chip-bungkus .chip-nav { flex: 1; min-width: 0; scroll-behavior: auto; padding-block: 3px; }
+.chip-geser { display: none; flex: none; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid var(--garis-d); border-radius: 50%; background: rgba(255, 255, 255, .05); color: var(--teks-d); }
+.chip-geser:hover:not(:disabled) { border-color: var(--neon); color: var(--neon); }
+.chip-geser:disabled { opacity: .3; cursor: default; }
+@media (hover: hover) and (pointer: fine) {
+  .bisa-geser .chip-geser { display: inline-grid; }
+  .bisa-geser .chip-nav { cursor: grab; }
+  .chip-nav.diseret { cursor: grabbing; user-select: none; }
+  .chip-nav.diseret .chip { pointer-events: none; }
+}
+@media (min-width: 56rem) { .chip-bungkus { flex: 1; } }
