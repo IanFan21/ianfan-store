@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="id" data-basis="../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="noindex">
+<title>Admin | IanFan Store</title>
+<link rel="preload" href="../assets/fonts/syne-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/css/style.css?v=2">
+<link rel="stylesheet" href="../assets/css/tema.css?v=2">
+</head>
+<body class="halaman-admin">
+<canvas id="latar" aria-hidden="true"></canvas>
+<a class="lewati" href="#isi">Lewati ke isi</a>
+
+<header class="kepala">
+  <div class="wadah kepala-isi">
+    <a class="merek" href="../" aria-label="IanFan Store, ke situs">
+      <span class="merek-tanda" aria-hidden="true">IF</span>
+      <span class="merek-nama">Admin<span class="merek-ket" id="namaTokoAdmin">IanFan Store</span></span>
+    </a>
+    <div class="kepala-aksi" id="aksiKepala" hidden>
+      <a class="btn btn--terang btn--kecil" href="../" target="_blank" rel="noopener">Lihat situs</a>
+      <button type="button" class="btn btn--terang btn--kecil" id="btn-keluar">Keluar</button>
+    </div>
+  </div>
+</header>
+
+<main id="isi" tabindex="-1">
+  <div class="wadah">
+    <p class="status" id="memuat">Memuat…</p>
+
+    <!-- Masuk -->
+    <section id="v-masuk" class="panel-admin panel-masuk" hidden aria-labelledby="h-masuk">
+      <h1 id="h-masuk">Masuk admin</h1>
+      <p class="bantu-p">Hanya untuk pemilik toko. Pelanggan tidak perlu masuk untuk melihat harga.</p>
+      <form id="form-masuk" novalidate>
+        <div class="isian"><label for="email">Email</label><input id="email" type="email" autocomplete="username" required></div>
+        <div class="isian"><label for="sandi">Kata sandi</label><input id="sandi" type="password" autocomplete="current-password" required></div>
+        <button class="btn btn--amber" type="submit" id="btn-masuk">Masuk</button>
+        <p class="galat-p" id="galat-masuk" role="alert"></p>
+      </form>
+    </section>
+
+    <!-- Admin -->
+    <div id="v-admin" hidden>
+      <div class="pita" id="pita-lokal" role="note" hidden>
+        <strong>Mode lokal.</strong> Perubahan di halaman ini hanya tersimpan di browser ini, jadi pelanggan belum melihatnya.
+        Sambungkan database (README, langkah 2) agar perubahan langsung tampil untuk semua orang.
+        Sementara itu, unduh data lalu simpan sebagai <code>data/games/&lt;kode&gt;/&lt;kode&gt;.json</code> di repo.
+      </div>
+
+      <div class="app-admin">
+        <aside class="sisi" aria-label="Daftar game">
+          <h1 class="judul-sisi">Game</h1>
+          <div class="game-pilih" id="game-pilih" role="group" aria-label="Pilih game"></div>
+          <div class="sisi-aksi">
+            <button type="button" class="btn btn--amber btn--kecil" id="btn-game-baru">Tambah game</button>
+            <button type="button" class="btn btn--terang btn--kecil" id="btn-ekspor">Unduh data</button>
+            <button type="button" class="btn btn--terang btn--kecil" id="btn-setel" hidden>Kembalikan data awal</button>
+          </div>
+        </aside>
+
+        <section class="utama" id="area-game" aria-live="polite"></section>
+      </div>
+    </div>
+  </div>
+</main>
+
+<p class="toast" id="toast" role="status" aria-live="polite" hidden></p>
+
+<!-- Dialog: game -->
+<dialog id="dlg-game" aria-labelledby="dlg-game-h">
+  <form id="form-game" novalidate>
+    <h2 id="dlg-game-h">Game</h2>
+    <div class="isian"><label for="g-nama">Nama game</label><input id="g-nama" type="text" maxlength="80" placeholder="Honkai: Star Rail" required></div>
+    <div class="dua-kolom">
+      <div class="isian"><label for="g-kode">Kode singkat</label><input id="g-kode" type="text" maxlength="12" placeholder="HSR"><p class="petunjuk">Tampil besar di kartu. Contoh: HSR, ML, GI.</p></div>
+      <div class="isian"><label for="g-slug">Alamat (huruf kecil)</label><input id="g-slug" type="text" maxlength="40" placeholder="hsr"><p class="petunjuk" id="g-slug-ket">Dipakai di link, misalnya #/game/hsr.</p></div>
+    </div>
+    <div class="isian"><label for="g-sub">Keterangan singkat <span class="opsional">(opsional)</span></label><input id="g-sub" type="text" maxlength="160" placeholder="Joki akun, rawat akun, eksplorasi"></div>
+    <label class="centang"><input id="g-aktif" type="checkbox" checked> Tampilkan di situs</label>
+    <p class="galat-p" id="g-galat" role="alert"></p>
+    <div class="dlg-aksi"><button type="button" class="btn btn--garis" data-tutup>Batal</button><button class="btn btn--amber" type="submit">Simpan</button></div>
+  </form>
+</dialog>
+
+<!-- Dialog: kategori -->
+<dialog id="dlg-kat" aria-labelledby="dlg-kat-h">
+  <form id="form-kat" novalidate>
+    <h2 id="dlg-kat-h">Kategori</h2>
+    <div class="isian"><label for="k-nama">Nama kategori</label><input id="k-nama" type="text" maxlength="80" placeholder="Rawat Akun" required></div>
+    <div class="isian"><label for="k-ket">Catatan untuk pelanggan <span class="opsional">(opsional)</span></label><textarea id="k-ket" rows="3" maxlength="500" placeholder="Contoh: Ambil chest, puzzle, dan minigame di dunia tersebut."></textarea></div>
+    <p class="galat-p" id="k-galat" role="alert"></p>
+    <div class="dlg-aksi"><button type="button" class="btn btn--garis" data-tutup>Batal</button><button class="btn btn--amber" type="submit">Simpan</button></div>
+  </form>
+</dialog>
+
+<!-- Dialog: produk -->
+<dialog id="dlg-prod" aria-labelledby="dlg-prod-h">
+  <form id="form-prod" novalidate>
+    <h2 id="dlg-prod-h">Produk</h2>
+    <div class="isian"><label for="p-nama">Nama produk</label><input id="p-nama" type="text" maxlength="120" placeholder="Paket Lv" required></div>
+    <div class="isian"><label for="p-termasuk">Yang termasuk <span class="opsional">(opsional)</span></label><textarea id="p-termasuk" rows="3" maxlength="600" placeholder="Contoh: LV sampai 60, bonus rank X4"></textarea></div>
+    <fieldset class="opsi-set">
+      <legend>Harga</legend>
+      <p class="petunjuk">Ketik angka biasa (60000) atau singkat (60k). Satu produk boleh punya beberapa harga, misalnya per map dan paket semua map.</p>
+      <div id="p-opsi"></div>
+      <button type="button" class="btn btn--garis btn--kecil" id="p-tambah-opsi">Tambah pilihan harga</button>
+    </fieldset>
+    <label class="centang"><input id="p-tersedia" type="checkbox" checked> Tersedia (matikan jika sedang penuh atau tutup)</label>
+    <p class="galat-p" id="p-galat" role="alert"></p>
+    <div class="dlg-aksi"><button type="button" class="btn btn--garis" data-tutup>Batal</button><button class="btn btn--amber" type="submit">Simpan</button></div>
+  </form>
+</dialog>
+
+<!-- Dialog: impor teks -->
+<dialog id="dlg-impor" aria-labelledby="dlg-impor-h" class="lebar">
+  <form id="form-impor" novalidate>
+    <h2 id="dlg-impor-h">Impor dari teks</h2>
+    <p class="petunjuk">Tempel daftar harga dalam format di bawah. Hasilnya diperiksa dulu sebelum dimasukkan.</p>
+    <details class="contoh">
+      <summary>Lihat format</summary>
+      <pre>---------- RAWAT AKUN ----------
+Monthly = 65K
+  Termasuk: Daily, Weekly boss, MoC
+1 Patch = 100K
+
+---------- EKSPLORASI ----------
+KET: Ambil chest dan puzzle di dunia tersebut.
+Penacony = 20K-30K/map, paket semua map 180K
+
+TIDAK MASUK LIST   (semua di bawah baris ini diabaikan)</pre>
+      <p class="petunjuk">Baris <code>Nama = Harga</code> adalah produk. Baris <code>Termasuk:</code> dan <code>KET:</code> hanya keterangan. Beberapa harga dipisah koma.</p>
+    </details>
+    <div class="isian"><label for="i-teks">Teks daftar harga</label><textarea id="i-teks" rows="10" spellcheck="false"></textarea></div>
+    <button type="button" class="btn btn--ink btn--kecil" id="i-baca">Periksa teks</button>
+    <div id="i-hasil" class="hasil-impor" role="status"></div>
+    <label class="centang" id="i-ganti-wrap" hidden><input id="i-ganti" type="checkbox"> Hapus dulu semua kategori game ini, ganti dengan isi teks</label>
+    <p class="galat-p" id="i-galat" role="alert"></p>
+    <div class="dlg-aksi"><button type="button" class="btn btn--garis" data-tutup>Batal</button><button class="btn btn--amber" type="submit" id="i-masuk" disabled>Masukkan ke game</button></div>
+  </form>
+</dialog>
+
+<!-- Dialog: konfirmasi -->
+<dialog id="dlg-konfirm" aria-labelledby="dlg-konfirm-h">
+  <form method="dialog" id="form-konfirm">
+    <h2 id="dlg-konfirm-h">Yakin?</h2>
+    <p id="konfirm-isi" class="konfirm-isi"></p>
+    <div class="dlg-aksi"><button type="button" class="btn btn--garis" data-tutup>Batal</button><button class="btn btn--bahaya-isi" type="submit" id="konfirm-ya" value="ya">Hapus</button></div>
+  </form>
+</dialog>
+
+<script src="../assets/js/config/config.js?v=2"></script>
+<script src="../assets/js/lib/util.js?v=2"></script>
+<script src="../assets/js/lib/impor.js?v=2"></script>
+<script src="../assets/js/data/data.js?v=2"></script>
+<script src="../assets/js/lib/latar.js?v=2" defer></script>
+<script src="../assets/js/pages/admin.js?v=2" defer></script>
+</body>
+</html>

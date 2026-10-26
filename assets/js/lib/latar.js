@@ -1,0 +1,109 @@
+/* Latar animasi bertema game: lantai grid perspektif, partikel, dan chevron "rank up" yang naik pelan.
+   Juga: cahaya yang mengikuti kursor dan bilah progres gulir. Mati otomatis bila pengguna meminta gerak dikurangi. */
+(function () {
+  var c = document.getElementById("latar");
+  var kurang = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var ctx = c && c.getContext ? c.getContext("2d") : null;
+  var W = 0, H = 0, hor = 0, t = 0, parts = [], raf = 0;
+
+  function acak(a, b) { return a + Math.random() * (b - a); }
+
+  function ukur() {
+    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    W = window.innerWidth; H = window.innerHeight; hor = H * 0.6;
+    c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var n = Math.round(Math.min(64, (W * H) / 22000));
+    parts = [];
+    for (var i = 0; i < n; i++) {
+      parts.push({ x: acak(0, W), y: acak(0, H), r: acak(0.6, 1.8), v: acak(0.12, 0.5), chev: Math.random() < 0.22, h: Math.random() < 0.55 ? 188 : 262, a: acak(0.25, 0.8), s: acak(6, 13), f: acak(0, 6.28) });
+    }
+  }
+
+  function chevron(x, y, s, warna) {
+    ctx.strokeStyle = warna; ctx.lineWidth = 1.6; ctx.beginPath();
+    ctx.moveTo(x - s, y + s * 0.5); ctx.lineTo(x, y - s * 0.5); ctx.lineTo(x + s, y + s * 0.5);
+    ctx.moveTo(x - s, y + s * 1.4); ctx.lineTo(x, y + s * 0.4); ctx.lineTo(x + s, y + s * 1.4);
+    ctx.stroke();
+  }
+
+  function gambar() {
+    ctx.clearRect(0, 0, W, H);
+    var i, p, tinggi = H - hor;
+
+    /* lantai grid */
+    var garis = 16;
+    ctx.lineWidth = 1;
+    for (i = 0; i < garis; i++) {
+      var z = (i + (t % 1)) / garis;
+      var y = hor + tinggi * Math.pow(z, 2.3);
+      ctx.strokeStyle = "rgba(56,240,255," + (0.03 + 0.2 * z).toFixed(3) + ")";
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+    var tiang = 22, lebar = Math.max(W, 900) * 0.2;
+    for (i = -tiang / 2; i <= tiang / 2; i++) {
+      var g = ctx.createLinearGradient(0, hor, 0, H);
+      g.addColorStop(0, "rgba(143,107,255,0)"); g.addColorStop(1, "rgba(143,107,255,.28)");
+      ctx.strokeStyle = g;
+      ctx.beginPath(); ctx.moveTo(W / 2 + i * W * 0.012, hor); ctx.lineTo(W / 2 + i * lebar * 0.55, H); ctx.stroke();
+    }
+
+    /* partikel dan chevron */
+    for (i = 0; i < parts.length; i++) {
+      p = parts[i];
+      var kerlip = 0.6 + 0.4 * Math.sin(t * 2 + p.f);
+      var warna = "hsla(" + p.h + ",100%,70%," + (p.a * kerlip).toFixed(3) + ")";
+      if (p.chev) chevron(p.x, p.y, p.s, warna);
+      else { ctx.fillStyle = warna; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.2832); ctx.fill(); }
+      if (!kurang) {
+        p.y -= p.v * (p.chev ? 1.2 : 1);
+        if (p.y < -20) { p.y = H + 20; p.x = acak(0, W); }
+      }
+    }
+  }
+
+  function putar() {
+    t += 0.0042;
+    gambar();
+    raf = requestAnimationFrame(putar);
+  }
+  function jalan() { if (!raf && !kurang) raf = requestAnimationFrame(putar); }
+  function henti() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+
+  if (ctx) {
+    ukur(); gambar();
+    var tunda = 0;
+    window.addEventListener("resize", function () { clearTimeout(tunda); tunda = setTimeout(function () { ukur(); gambar(); }, 150); });
+    document.addEventListener("visibilitychange", function () { document.hidden ? henti() : jalan(); });
+    jalan();
+  }
+
+  /* cahaya mengikuti kursor (hanya perangkat dengan kursor halus) */
+  if (!kurang && window.matchMedia && matchMedia("(pointer:fine)").matches) {
+    var tx = 0.5, ty = 0.3, cx = 0.5, cy = 0.3, rafM = 0;
+    var akar = document.documentElement;
+    window.addEventListener("pointermove", function (e) {
+      tx = e.clientX / window.innerWidth; ty = e.clientY / window.innerHeight;
+      if (!rafM) rafM = requestAnimationFrame(ikuti);
+    }, { passive: true });
+    var ikuti = function () {
+      cx += (tx - cx) * 0.08; cy += (ty - cy) * 0.08;
+      akar.style.setProperty("--mx", (cx * 100).toFixed(1) + "%");
+      akar.style.setProperty("--my", (cy * 100).toFixed(1) + "%");
+      rafM = (Math.abs(tx - cx) + Math.abs(ty - cy) > 0.002) ? requestAnimationFrame(ikuti) : 0;
+    };
+  }
+
+  /* bilah progres gulir */
+  var bar = document.getElementById("progres");
+  if (bar) {
+    var tunggu = false;
+    var perbarui = function () {
+      tunggu = false;
+      var tot = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.transform = "scaleX(" + (tot > 0 ? Math.min(1, window.scrollY / tot) : 0).toFixed(4) + ")";
+    };
+    window.addEventListener("scroll", function () { if (!tunggu) { tunggu = true; requestAnimationFrame(perbarui); } }, { passive: true });
+    perbarui();
+  }
+})();

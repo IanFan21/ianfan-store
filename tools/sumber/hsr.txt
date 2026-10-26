@@ -1,0 +1,92 @@
+# CARA BACA UNTUK AI:
+# - Baris "Nama = Harga" = ITEM yang dijual, wajib masuk list.
+# - Baris "Termasuk:" / "KET:" = keterangan benefit saja, BUKAN item baru.
+# - Bagian "TIDAK MASUK LIST" di akhir = item yang DILARANG masuk list.
+
+==============================
+PRICE LIST JOKI HSR
+==============================
+
+---------- DU ----------
+Paket Lv = 60K
+  Termasuk: LV sampai 60, bonus rank X4, cicilan Galeri Probabilitas, Larik Stabil sebagian
+Paket No Conundrum = 95K
+  Termasuk: LV sampai 60, semua reward SJ (koneksi, strategi, lingkungan, tantangan), bonus rank X1
+Paket Full Reward SJ = 115K
+  Termasuk: LV sampai 60, full semua reward, Galeri Probabilitas & Larik Stabil full clear, bonus rank X9
+
+---------- CW ----------
+Paket Lv = 110K
+  Termasuk: CW sampai level 110 (atau sesuai request), bonus rank A5
+Paket Full Reward SJ = 200K
+  Termasuk: CW level 110, SJ full, rank sampai A8
+Paket Standard = 168K
+  Termasuk: CW level 110, SJ (koneksi, strategi, lingkungan, tantangan), bonus rank A5
+
+---------- SIMULATED UNIVERSE (SU) ----------
+SU Bencana Swarm (Full Reward SJ) = 70K
+  Termasuk: Full clear reward Swarm
+SU Emas & Mesin / GNG (Full Reward SJ) = 70K
+  Termasuk: Full clear reward GNG
+SU Unknown Domain (Full Reward SJ) = 80K
+  Termasuk: Full clear reward Unknown Domain
+SU Normal per World = 5K
+  Termasuk: SU normal per world
+
+---------- RAWAT AKUN ----------
+MONTHLY = 65K
+  Termasuk: Daily, Spend stamina, Weekly boss + weekly reward, MoC, PF
+MONTHLY VIP = 100K
+  Termasuk: Daily, Spend stamina, Weekly boss + weekly reward, MoC, PF, AS, Ongoing event
+1 Patch = 100K
+  Termasuk: Daily mission, Weekly boss, Weekly reward, DU, CW, MoC, PF, AS
+1 Patch + ongoing event = 130K
+VIP 1 Patch = 160K
+  Termasuk: Daily mission, Weekly boss, DU, CW, MoC, PF, AS, AA, Event (hanya ongoing)
+
+---------- ADDON ----------
+MoC = 10K
+PF = 10K
+AS = 10K
+AA = 25K
+Ongoing Event = 20K
+
+---------- CONUNDRUM DU ----------
+X7 = 15K
+X8 = 20K
+X9 = 25K
+Bundle X7 → X9 = 40K
+
+---------- EKSPLORASI ----------
+KET: Ambil chest, puzzle, dan minigame di dunia tersebut.
+Herta Space Station = 5K/map, paket semua map 20K
+Jarilo-VI = 5K/map, paket semua map 40K
+Xianzhou Luofu = 8K/map, paket semua map 80K
+Penacony = 20K–30K/map, paket semua map 180K
+Amphoreus = 20K–30K/map, paket semua map 250K
+Planarcadia = 15K/map, paket semua map 150K
+Astropolis = 15K/map, paket semua map 50K
+
+---------- BUILD CHARACTER ----------
+Lv up 1-80 = 10K
+Max trace = 25K
+Spam energi untuk relic +15 bagus = 15K/relic
+All komplit = 75K
+
+---------- STORY (harga terbaru) ----------
+Herta Space = total 20K
+Jarilo-VI = 10K/patch, total 20K
+Xianzhou Luofu = 10K/patch, total 40K
+Penacony = 15K/patch, total 60K
+Amphoreus = 13K/patch, total 100K
+Planarcadia = 10K/patch, total 40K
+
+==============================
+TIDAK MASUK LIST (jangan dimasukkan lagi)
+==============================
+- Harian (rawat akun) — tidak ada di list terbaru
+- Mingguan (rawat akun) — tidak ada di list terbaru
+- VIP 2 Monthly (format rawat akun lama) — sudah diganti format Monthly baru
+- Harga lama Monthly dan VIP 1 Patch — sudah diganti
+- Full Story Patch 1-ongoing (harga web lama) — tidak ada di list story terbaru
+- Harga story web lama — sudah diganti harga terbaru

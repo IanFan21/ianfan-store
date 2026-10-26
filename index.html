@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id" data-basis="./">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>IanFan Store: daftar harga joki game</title>
+<meta name="description" content="Daftar harga joki game IanFan Store. Pilih game, lihat paket dan harganya.">
+<link rel="preload" href="assets/fonts/syne-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/style.css?v=2">
+<link rel="stylesheet" href="assets/css/tema.css?v=2">
+</head>
+<body class="publik">
+<canvas id="latar" aria-hidden="true"></canvas>
+<div class="progres" id="progres" aria-hidden="true"></div>
+<a class="lewati" href="#isi">Lewati ke isi</a>
+
+<header class="kepala">
+  <div class="wadah kepala-isi">
+    <a class="merek" href="#/" aria-label="IanFan Store, ke daftar game">
+      <span class="merek-tanda" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 6h10a4 4 0 0 1 4 4v4a3 3 0 0 1-5.2 2L14 14h-4l-1.8 2A3 3 0 0 1 3 14v-4a4 4 0 0 1 4-4z"/><path d="M7.5 10v4M5.5 12h4"/><circle cx="15.5" cy="10.5" r=".9" fill="currentColor"/><circle cx="17.8" cy="12.8" r=".9" fill="currentColor"/></svg></span>
+      <span class="merek-nama" id="namaToko">IanFan Store<span class="merek-ket" id="sloganToko">Daftar harga joki game</span></span>
+    </a>
+    <a class="tautan-balik" id="tautanBalik" href="#/" hidden>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      Semua game
+    </a>
+  </div>
+</header>
+
+<main id="isi" tabindex="-1">
+  <div class="wadah" id="tampilan" aria-live="polite"></div>
+</main>
+
+<footer class="kaki">
+  <div class="wadah kaki-isi">
+    <p>Harga bisa berubah. Tanyakan dulu sebelum order.</p>
+    <p><a href="admin/">Masuk admin</a></p>
+  </div>
+</footer>
+
+<script src="assets/js/config/config.js?v=2"></script>
+<script src="assets/js/lib/util.js?v=2"></script>
+<script src="assets/js/lib/ikon.js?v=2"></script>
+<script src="assets/js/lib/latar.js?v=2" defer></script>
+<script src="assets/js/data/data.js?v=2"></script>
+<script src="assets/js/pages/beranda.js?v=2" defer></script>
+</body>
+</html>

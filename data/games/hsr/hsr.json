@@ -1,0 +1,627 @@
+{
+  "slug": "hsr",
+  "kode": "HSR",
+  "nama": "Honkai: Star Rail",
+  "subjudul": "Joki akun, rawat akun, eksplorasi, dan story",
+  "diperbarui": "2026-10-26",
+  "kategori": [
+    {
+      "nama": "DU",
+      "ket": "",
+      "produk": [
+        {
+          "nama": "Paket Lv",
+          "termasuk": "LV sampai 60, bonus rank X4, cicilan Galeri Probabilitas, Larik Stabil sebagian",
+          "harga": [
+            {
+              "label": "",
+              "min": 60000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Paket No Conundrum",
+          "termasuk": "LV sampai 60, semua reward SJ (koneksi, strategi, lingkungan, tantangan), bonus rank X1",
+          "harga": [
+            {
+              "label": "",
+              "min": 95000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Paket Full Reward SJ",
+          "termasuk": "LV sampai 60, full semua reward, Galeri Probabilitas & Larik Stabil full clear, bonus rank X9",
+          "harga": [
+            {
+              "label": "",
+              "min": 115000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nama": "CW",
+      "ket": "",
+      "produk": [
+        {
+          "nama": "Paket Lv",
+          "termasuk": "CW sampai level 110 (atau sesuai request), bonus rank A5",
+          "harga": [
+            {
+              "label": "",
+              "min": 110000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Paket Full Reward SJ",
+          "termasuk": "CW level 110, SJ full, rank sampai A8",
+          "harga": [
+            {
+              "label": "",
+              "min": 200000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Paket Standard",
+          "termasuk": "CW level 110, SJ (koneksi, strategi, lingkungan, tantangan), bonus rank A5",
+          "harga": [
+            {
+              "label": "",
+              "min": 168000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nama": "Simulated Universe (SU)",
+      "ket": "",
+      "produk": [
+        {
+          "nama": "SU Bencana Swarm (Full Reward SJ)",
+          "termasuk": "Full clear reward Swarm",
+          "harga": [
+            {
+              "label": "",
+              "min": 70000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "SU Emas & Mesin / GNG (Full Reward SJ)",
+          "termasuk": "Full clear reward GNG",
+          "harga": [
+            {
+              "label": "",
+              "min": 70000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "SU Unknown Domain (Full Reward SJ)",
+          "termasuk": "Full clear reward Unknown Domain",
+          "harga": [
+            {
+              "label": "",
+              "min": 80000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "SU Normal per World",
+          "termasuk": "SU normal per world",
+          "harga": [
+            {
+              "label": "",
+              "min": 5000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nama": "Rawat Akun",
+      "ket": "",
+      "produk": [
+        {
+          "nama": "Monthly",
+          "termasuk": "Daily, Spend stamina, Weekly boss + weekly reward, MoC, PF",
+          "harga": [
+            {
+              "label": "",
+              "min": 65000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Monthly VIP",
+          "termasuk": "Daily, Spend stamina, Weekly boss + weekly reward, MoC, PF, AS, Ongoing event",
+          "harga": [
+            {
+              "label": "",
+              "min": 100000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "1 Patch",
+          "termasuk": "Daily mission, Weekly boss, Weekly reward, DU, CW, MoC, PF, AS",
+          "harga": [
+            {
+              "label": "",
+              "min": 100000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "1 Patch + ongoing event",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 130000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "VIP 1 Patch",
+          "termasuk": "Daily mission, Weekly boss, DU, CW, MoC, PF, AS, AA, Event (hanya ongoing)",
+          "harga": [
+            {
+              "label": "",
+              "min": 160000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nama": "Addon",
+      "ket": "",
+      "produk": [
+        {
+          "nama": "MoC",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 10000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "PF",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 10000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "AS",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 10000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "AA",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 25000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Ongoing Event",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 20000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nama": "Conundrum DU",
+      "ket": "",
+      "produk": [
+        {
+          "nama": "X7",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 15000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "X8",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 20000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "X9",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 25000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Bundle X7 → X9",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 40000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nama": "Eksplorasi",
+      "ket": "Ambil chest, puzzle, dan minigame di dunia tersebut.",
+      "produk": [
+        {
+          "nama": "Herta Space Station",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 5000,
+              "max": null,
+              "satuan": "/map"
+            },
+            {
+              "label": "Paket semua map",
+              "min": 20000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Jarilo-VI",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 5000,
+              "max": null,
+              "satuan": "/map"
+            },
+            {
+              "label": "Paket semua map",
+              "min": 40000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Xianzhou Luofu",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 8000,
+              "max": null,
+              "satuan": "/map"
+            },
+            {
+              "label": "Paket semua map",
+              "min": 80000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Penacony",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 20000,
+              "max": 30000,
+              "satuan": "/map"
+            },
+            {
+              "label": "Paket semua map",
+              "min": 180000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Amphoreus",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 20000,
+              "max": 30000,
+              "satuan": "/map"
+            },
+            {
+              "label": "Paket semua map",
+              "min": 250000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Planarcadia",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 15000,
+              "max": null,
+              "satuan": "/map"
+            },
+            {
+              "label": "Paket semua map",
+              "min": 150000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Astropolis",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 15000,
+              "max": null,
+              "satuan": "/map"
+            },
+            {
+              "label": "Paket semua map",
+              "min": 50000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nama": "Build Character",
+      "ket": "",
+      "produk": [
+        {
+          "nama": "Lv up 1-80",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 10000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Max trace",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 25000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Spam energi untuk relic +15 bagus",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 15000,
+              "max": null,
+              "satuan": "/relic"
+            }
+          ]
+        },
+        {
+          "nama": "All komplit",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 75000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nama": "Story",
+      "ket": "",
+      "produk": [
+        {
+          "nama": "Herta Space",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "Total",
+              "min": 20000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Jarilo-VI",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 10000,
+              "max": null,
+              "satuan": "/patch"
+            },
+            {
+              "label": "Total",
+              "min": 20000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Xianzhou Luofu",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 10000,
+              "max": null,
+              "satuan": "/patch"
+            },
+            {
+              "label": "Total",
+              "min": 40000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Penacony",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 15000,
+              "max": null,
+              "satuan": "/patch"
+            },
+            {
+              "label": "Total",
+              "min": 60000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Amphoreus",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 13000,
+              "max": null,
+              "satuan": "/patch"
+            },
+            {
+              "label": "Total",
+              "min": 100000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        },
+        {
+          "nama": "Planarcadia",
+          "termasuk": "",
+          "harga": [
+            {
+              "label": "",
+              "min": 10000,
+              "max": null,
+              "satuan": "/patch"
+            },
+            {
+              "label": "Total",
+              "min": 40000,
+              "max": null,
+              "satuan": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
