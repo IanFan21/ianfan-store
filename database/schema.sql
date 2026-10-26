@@ -40,10 +40,14 @@ create table if not exists public.games (
   kode      text not null default '' check (char_length(kode) <= 12),
   nama      text not null check (char_length(nama) between 1 and 80),
   subjudul  text not null default '' check (char_length(subjudul) <= 160),
+  logo      text not null default '' check (char_length(logo) <= 60000),
   aktif     boolean not null default true,
   urutan    integer not null default 0,
   diubah    timestamptz not null default now()
 );
+
+-- Database lama (dibuat sebelum fitur logo)? Jalankan sekali baris ini:
+alter table public.games add column if not exists logo text not null default '' check (char_length(logo) <= 60000);
 
 create table if not exists public.kategori (
   id        uuid primary key default gen_random_uuid(),

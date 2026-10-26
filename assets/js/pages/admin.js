@@ -210,6 +210,7 @@
     $("g-sub").value = baru ? "" : g.subjudul || "";
     $("g-aktif").checked = baru ? true : g.aktif !== false;
     $("g-galat").textContent = "";
+    aturLogo(baru ? "" : g.logo || "", baru);
     slugManual = !baru;
     $("form-game").dataset.id = baru ? "" : g.id;
     buka($("dlg-game"));
@@ -217,6 +218,71 @@
   function slugOtomatis() {
     if (!slugManual) $("g-slug").value = u.slug($("g-kode").value.trim() || $("g-nama").value);
   }
+  /* ----- Logo game: cari otomatis (iTunes + Wikipedia), unggah, tempel link ----- */
+  var logoNilai = "", logoManual = false, logoTunda = 0, logoNomor = 0;
+  function pratinjau() {
+    var w = $("g-logo-pr");
+    w.replaceChildren();
+    if (logoNilai) {
+      var img = h("img", { src: logoNilai, alt: "", width: 56, height: 56, referrerpolicy: "no-referrer" });
+      img.addEventListener("error", function () { w.replaceChildren(h("span", { class: "logo-kosong", text: "?" })); $("g-logo-ket").textContent = "Gambar tidak bisa dimuat. Coba pilihan lain."; });
+      w.append(img);
+    } else w.append(h("span", { class: "logo-kosong", text: "Logo" }));
+  }
+  function aturLogo(nilai, otomatis) {
+    logoNilai = nilai || ""; logoManual = !otomatis && !!nilai;
+    $("g-logo-hasil").replaceChildren(); $("g-logo-link").value = "";
+    $("g-logo-ket").textContent = otomatis ? "Dicari otomatis dari nama game. Pilih yang paling cocok." : "";
+    pratinjau();
+  }
+  function pilihLogo(url, dariOtomatis) {
+    var nomor = ++logoNomor;
+    $("g-logo-ket").textContent = "Menyiapkan logo…";
+    IFS.logo.siapkan(url).then(function (hasil) {
+      if (nomor !== logoNomor) return;
+      logoNilai = hasil; logoManual = !dariOtomatis; pratinjau();
+      $("g-logo-ket").textContent = dariOtomatis ? "Logo dipilih otomatis. Klik pilihan lain bila kurang cocok." : "Logo dipakai.";
+    }).catch(function (e) { $("g-logo-ket").textContent = e.message || "Logo gagal dipakai."; });
+  }
+  function cariLogo(otomatis) {
+    var nama = $("g-nama").value.trim();
+    if (nama.length < 2) { $("g-logo-ket").textContent = "Isi nama game dulu."; return; }
+    var nomor = ++logoNomor;
+    $("g-logo-ket").textContent = "Mencari logo…";
+    $("g-logo-hasil").replaceChildren();
+    IFS.logo.cari(nama).then(function (daftar) {
+      if (nomor !== logoNomor) return;
+      if (!daftar.length) { $("g-logo-ket").textContent = "Logo tidak ditemukan. Unggah gambar atau tempel link."; return; }
+      var kotak = $("g-logo-hasil");
+      daftar.forEach(function (d) {
+        var tb = h("button", { type: "button", class: "logo-pilihan", title: d.judul + " (" + d.sumber + ")", "aria-label": "Pakai logo " + d.judul }, h("img", { src: d.url, alt: "", width: 48, height: 48, loading: "lazy", referrerpolicy: "no-referrer" }));
+        tb.addEventListener("click", function () { pilihLogo(d.url, false); });
+        kotak.append(tb);
+      });
+      $("g-logo-ket").textContent = daftar.length + " kandidat ditemukan. Klik untuk memilih.";
+      if (otomatis && !logoManual && !logoNilai) pilihLogo(daftar[0].url, true);
+    }).catch(function () { $("g-logo-ket").textContent = "Pencarian logo gagal (periksa internet). Unggah gambar atau tempel link."; });
+  }
+  $("g-logo-cari").addEventListener("click", function () { logoManual = false; logoNilai = ""; cariLogo(true); });
+  $("g-logo-hapus").addEventListener("click", function () { logoNomor++; aturLogo("", false); logoManual = true; $("g-logo-ket").textContent = "Logo dihapus; kartu memakai ikon bawaan."; });
+  $("g-logo-file").addEventListener("change", function () {
+    var f = this.files && this.files[0]; this.value = "";
+    if (!f) return;
+    var nomor = ++logoNomor;
+    IFS.logo.dariFile(f).then(function (hasil) { if (nomor !== logoNomor) return; logoNilai = hasil; logoManual = true; pratinjau(); $("g-logo-ket").textContent = "Gambar diunggah dan dikecilkan."; })
+      .catch(function (e) { $("g-logo-ket").textContent = e.message || "Gambar gagal dibaca."; });
+  });
+  $("g-logo-link").addEventListener("change", function () {
+    var v = this.value.trim(); if (!v) return;
+    if (!/^https:\/\//i.test(v)) { $("g-logo-ket").textContent = "Link harus diawali https://"; return; }
+    pilihLogo(v, false);
+  });
+  $("g-nama").addEventListener("input", function () {
+    if ($("form-game").dataset.id || logoManual) return; /* hanya untuk game baru yang logonya belum dipilih manual */
+    clearTimeout(logoTunda);
+    logoTunda = setTimeout(function () { if (!logoManual) { logoNilai = ""; cariLogo(true); } }, 900);
+  });
+
   $("g-nama").addEventListener("input", slugOtomatis);
   $("g-kode").addEventListener("input", slugOtomatis);
   $("g-slug").addEventListener("input", function () { slugManual = true; });
@@ -232,7 +298,7 @@
     if (state.games.some(function (x) { return x.slug === slug && x.id !== id; })) { galat.textContent = "Alamat itu sudah dipakai game lain."; $("g-slug").focus(); return; }
     var ada = id ? state.games.find(function (x) { return x.id === id; }) : null;
     var urutanBaru = ada ? ada.urutan : state.games.length ? Math.max.apply(null, state.games.map(function (x) { return x.urutan || 0; })) + 1 : 0;
-    var baris = { id: id || u.id(), slug: slug, kode: $("g-kode").value.trim().toUpperCase().slice(0, 12), nama: nama, subjudul: $("g-sub").value.trim(), aktif: $("g-aktif").checked, urutan: urutanBaru };
+    var baris = { id: id || u.id(), slug: slug, kode: $("g-kode").value.trim().toUpperCase().slice(0, 12), nama: nama, subjudul: $("g-sub").value.trim(), logo: logoNilai, aktif: $("g-aktif").checked, urutan: urutanBaru };
     $("dlg-game").close("simpan");
     gameId = baris.id;
     jalankan(data.simpan("games", baris), ada ? "Game disimpan." : "Game ditambahkan.");

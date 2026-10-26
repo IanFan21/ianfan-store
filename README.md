@@ -8,7 +8,7 @@ index.html                      halaman pelanggan (wajib di root)
 admin/index.html                halaman admin
 assets/css/style.css, tema.css  gaya dan tema
 assets/js/config/config.js      PENGATURAN (nama toko, nomor WA, kunci Supabase)
-assets/js/lib/                  util.js, ikon.js, latar.js, impor.js
+assets/js/lib/                  util.js, ikon.js, latar.js, impor.js, logo.js
 assets/js/data/data.js          akses data (Supabase / lokal)
 assets/js/pages/                beranda.js (pelanggan), admin.js
 assets/js/vendor/supabase.js    pustaka Supabase
@@ -39,3 +39,13 @@ Termasuk: isi paket
 Eksplor = 5K/map, paket semua map 20K
 ```
 `Termasuk:`/`KET:` adalah keterangan (bukan item). Bagian "TIDAK MASUK LIST" diabaikan.
+
+## Logo game
+Saat menambah/ubah game di admin, logo dicari otomatis dari nama game (App Store + Wikipedia). Klik kandidat lain bila kurang cocok, atau **Unggah gambar** / tempel link. Gambar dikecilkan jadi 128 px agar situs ringan. Tanpa logo, kartu memakai ikon gamepad. Ikon kategori (Rawat Akun, Eksplorasi, dst.) dipilih otomatis dari namanya.
+
+## Database lama?
+Kalau tabel `games` dibuat sebelum fitur logo, jalankan sekali di SQL Editor:
+`alter table public.games add column if not exists logo text not null default '' check (char_length(logo) <= 60000);`
+
+## Performa
+Salinan terakhir daftar harga disimpan di browser pelanggan sehingga halaman langsung tampil, lalu diperbarui di latar. Animasi latar dibatasi ~30 fps, otomatis dikurangi di perangkat hemat daya, dan mati bila pengguna meminta gerak dikurangi.

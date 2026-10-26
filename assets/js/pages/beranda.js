@@ -14,6 +14,20 @@
   var ik = IFS.ikon;
   function ikon(nama, ukuran, kelas) { return ik.el(nama, ukuran, kelas); }
 
+  function logoAman(u2) { return typeof u2 === "string" && (/^https:\/\//i.test(u2) || /^data:image\/(webp|png|jpe?g|gif);base64,/i.test(u2)); }
+  /* Logo game bila ada (gambar kecil, dimuat malas); jatuh kembali ke ikon bila gagal dimuat. */
+  function wadahLogo(g, ukuran, kelas) {
+    var w = h("span", { class: kelas });
+    var cadangan = function () { w.replaceChildren(ikon("gamepad", Math.round(ukuran * 0.5))); };
+    if (logoAman(g.logo)) {
+      var img = h("img", { src: g.logo, alt: "", width: ukuran, height: ukuran, loading: "lazy", decoding: "async", referrerpolicy: "no-referrer" });
+      img.addEventListener("error", cadangan);
+      w.append(img);
+      w.classList.add("ada-logo");
+    } else cadangan();
+    return w;
+  }
+
   function semuaProduk(g) {
     return g.kategori.reduce(function (a, k) { return a.concat(k.produk); }, []);
   }
@@ -81,7 +95,7 @@
         ul.append(h("li", {},
           h("a", { class: "kartu-game", href: "#/game/" + g.slug },
             h("div", { class: "kartu-atas" },
-              h("span", { class: "kartu-ikon" }, ikon("gamepad", 28)),
+              wadahLogo(g, 56, "kartu-ikon"),
               h("span", { class: "kode", text: g.kode || g.nama.slice(0, 3).toUpperCase() })
             ),
             h("h2", { text: g.nama }),
@@ -176,6 +190,7 @@
     var input = h("input", { type: "search", id: "cari", placeholder: "Cari paket, misalnya Monthly", autocomplete: "off", "aria-label": "Cari paket" });
 
     var kepala = h("div", { class: "judul-game" },
+      logoAman(g.logo) ? wadahLogo(g, 72, "logo-judul") : null,
       h("span", { class: "kode", "aria-hidden": "true", text: g.kode || g.nama.slice(0, 3).toUpperCase() }),
       h("div", {},
         h("h1", { id: "h-game", text: g.nama }),
@@ -256,10 +271,10 @@
   }
 
   /* ---------- Rute ---------- */
-  function render() {
+  function render(tanpaGulir) {
     if (pengamat) { pengamat.disconnect(); pengamat = null; }
     var m = /^#\/game\/([a-z0-9-]+)\/?$/.exec(location.hash);
-    window.scrollTo(0, 0);
+    if (tanpaGulir !== true) window.scrollTo(0, 0);
     if (m) {
       var g = daftarGame.find(function (x) { return x.slug === m[1]; });
       if (g) { renderGame(g); return; }
@@ -278,10 +293,16 @@
     document.getElementById("namaToko").firstChild.textContent = C.NAMA_TOKO;
     document.getElementById("sloganToko").textContent = C.SLOGAN || "";
     tampilan.replaceChildren(h("p", { class: "status", text: "Memuat daftar harga…" }));
-    data.muat().then(function (s) {
-      daftarGame = data.pohon(s).filter(function (g) { return g.aktif !== false; });
+    function ambilGame(s) { return data.pohon(s).filter(function (g) { return g.aktif !== false; }); }
+    data.muatCepat(function (baru) {
+      /* data baru dari server: pakai bila pengunjung belum mengetik di kotak cari */
+      daftarGame = ambilGame(baru);
+      var cari = document.getElementById("cari");
+      if (!cari || !cari.value) render(true);
+    }).then(function (s) {
+      daftarGame = ambilGame(s);
       render();
-      window.addEventListener("hashchange", render);
+      window.addEventListener("hashchange", function () { render(); });
     }).catch(function (e) {
       tampilan.replaceChildren(h("p", { class: "status status--galat", role: "alert", text: "Daftar harga gagal dimuat. Periksa koneksi internet, lalu muat ulang halaman." }));
       if (window.console) console.error(e);

@@ -55,7 +55,7 @@
     var s = { games: [], kategori: [], produk: [] };
     var gid = u.id();
     var waktu = game.diperbarui ? new Date(game.diperbarui + "T00:00:00Z").toISOString() : new Date().toISOString();
-    s.games.push({ id: gid, slug: game.slug, kode: game.kode || "", nama: game.nama, subjudul: game.subjudul || "", aktif: game.aktif !== false, urutan: game.urutan || 0, diubah: waktu });
+    s.games.push({ id: gid, slug: game.slug, kode: game.kode || "", nama: game.nama, subjudul: game.subjudul || "", logo: game.logo || "", aktif: game.aktif !== false, urutan: game.urutan || 0, diubah: waktu });
     (game.kategori || []).forEach(function (k, i) {
       var kid = u.id();
       s.kategori.push({ id: kid, game_id: gid, nama: k.nama, ket: k.ket || "", urutan: i });
@@ -132,6 +132,26 @@
       });
     },
 
+    /* Pelanggan: tampilkan salinan terakhir (disimpan di browser) seketika, lalu segarkan di latar.
+       saatSegar(state) dipanggil hanya jika isi dari server berbeda. */
+    muatCepat: function (saatSegar) {
+      if (!pakaiSupabase) return data.muat();
+      var kunci = "ianfan-cache-v1", lama = null;
+      try { lama = JSON.parse(localStorage.getItem(kunci) || "null"); } catch (e) {}
+      var ambil = data.muat().then(function (baru) {
+        var teks = JSON.stringify(baru);
+        try { localStorage.setItem(kunci, teks); } catch (e) {}
+        return { baru: baru, teks: teks };
+      });
+      if (lama && lama.games && lama.kategori && lama.produk) {
+        memori = lama;
+        var teksLama = JSON.stringify(lama);
+        ambil.then(function (r) { if (r.teks !== teksLama && saatSegar) saatSegar(r.baru); }).catch(function () {});
+        return Promise.resolve(lama);
+      }
+      return ambil.then(function (r) { return r.baru; });
+    },
+
     /* Hanya mode lokal: kembali ke data dari folder data/. */
     setelUlang: function () {
       if (pakaiSupabase) return Promise.resolve();
@@ -206,7 +226,7 @@
     /* tandai game sebagai baru diubah (tanggal "diperbarui" di halaman pelanggan) */
     sentuhGame: function (gameId) {
       var g = memori.games.find(function (x) { return x.id === gameId; });
-      return g ? data.simpan("games", { id: g.id, slug: g.slug, kode: g.kode, nama: g.nama, subjudul: g.subjudul, aktif: g.aktif, urutan: g.urutan }) : Promise.resolve();
+      return g ? data.simpan("games", { id: g.id, slug: g.slug, kode: g.kode, nama: g.nama, subjudul: g.subjudul, logo: g.logo || "", aktif: g.aktif, urutan: g.urutan }) : Promise.resolve();
     },
 
     /* Masukkan hasil baca teks (impor.baca) ke sebuah game. */

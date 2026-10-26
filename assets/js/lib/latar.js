@@ -4,16 +4,18 @@
   var c = document.getElementById("latar");
   var kurang = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   var ctx = c && c.getContext ? c.getContext("2d") : null;
-  var W = 0, H = 0, hor = 0, t = 0, parts = [], raf = 0;
+  var W = 0, H = 0, hor = 0, t = 0, parts = [], raf = 0, terakhir = 0;
+  var hemat = (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) || (navigator.deviceMemory && navigator.deviceMemory <= 4) || (navigator.connection && navigator.connection.saveData);
+  var aura = document.createElement("div"); aura.className = "aura"; aura.setAttribute("aria-hidden", "true"); document.body.prepend(aura);
 
   function acak(a, b) { return a + Math.random() * (b - a); }
 
   function ukur() {
-    var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    var dpr = hemat ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
     W = window.innerWidth; H = window.innerHeight; hor = H * 0.6;
     c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    var n = Math.round(Math.min(64, (W * H) / 22000));
+    var n = Math.round(Math.min(hemat ? 24 : 56, (W * H) / (hemat ? 40000 : 24000)));
     parts = [];
     for (var i = 0; i < n; i++) {
       parts.push({ x: acak(0, W), y: acak(0, H), r: acak(0.6, 1.8), v: acak(0.12, 0.5), chev: Math.random() < 0.22, h: Math.random() < 0.55 ? 188 : 262, a: acak(0.25, 0.8), s: acak(6, 13), f: acak(0, 6.28) });
@@ -32,7 +34,7 @@
     var i, p, tinggi = H - hor;
 
     /* lantai grid */
-    var garis = 16;
+    var garis = hemat ? 10 : 14;
     ctx.lineWidth = 1;
     for (i = 0; i < garis; i++) {
       var z = (i + (t % 1)) / garis;
@@ -40,11 +42,11 @@
       ctx.strokeStyle = "rgba(56,240,255," + (0.03 + 0.2 * z).toFixed(3) + ")";
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
     }
-    var tiang = 22, lebar = Math.max(W, 900) * 0.2;
+    var tiang = hemat ? 12 : 20, lebar = Math.max(W, 900) * 0.2;
+    var g = ctx.createLinearGradient(0, hor, 0, H);
+    g.addColorStop(0, "rgba(143,107,255,0)"); g.addColorStop(1, "rgba(143,107,255,.28)");
+    ctx.strokeStyle = g;
     for (i = -tiang / 2; i <= tiang / 2; i++) {
-      var g = ctx.createLinearGradient(0, hor, 0, H);
-      g.addColorStop(0, "rgba(143,107,255,0)"); g.addColorStop(1, "rgba(143,107,255,.28)");
-      ctx.strokeStyle = g;
       ctx.beginPath(); ctx.moveTo(W / 2 + i * W * 0.012, hor); ctx.lineTo(W / 2 + i * lebar * 0.55, H); ctx.stroke();
     }
 
@@ -62,10 +64,12 @@
     }
   }
 
-  function putar() {
-    t += 0.0042;
-    gambar();
+  function putar(now) {
     raf = requestAnimationFrame(putar);
+    if (now - terakhir < 33) return; /* maksimal ~30 gambar per detik */
+    terakhir = now;
+    t += 0.0075;
+    gambar();
   }
   function jalan() { if (!raf && !kurang) raf = requestAnimationFrame(putar); }
   function henti() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
@@ -81,7 +85,7 @@
   /* cahaya mengikuti kursor (hanya perangkat dengan kursor halus) */
   if (!kurang && window.matchMedia && matchMedia("(pointer:fine)").matches) {
     var tx = 0.5, ty = 0.3, cx = 0.5, cy = 0.3, rafM = 0;
-    var akar = document.documentElement;
+    var akar = aura;
     window.addEventListener("pointermove", function (e) {
       tx = e.clientX / window.innerWidth; ty = e.clientY / window.innerHeight;
       if (!rafM) rafM = requestAnimationFrame(ikuti);
