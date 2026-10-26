@@ -44,6 +44,52 @@
     return o ? u.teksHarga(o) : "";
   }
 
+  /* ---------- Kontak ---------- */
+  function daftarKontak() {
+    var k = [];
+    if (C.WA_NOMOR) k.push({ nama: "WhatsApp", ikon: "chat", ket: "Tanya harga & order", href: "https://wa.me/" + C.WA_NOMOR + "?text=" + encodeURIComponent("Halo " + C.NAMA_TOKO + ", saya mau tanya harga joki.") });
+    if (C.FB_URL) k.push({ nama: "Facebook", ikon: "facebook", ket: "Lihat profil", href: C.FB_URL });
+    if (C.DISCORD) k.push({ nama: "Discord", ikon: "discord", ket: C.DISCORD, salin: C.DISCORD });
+    return k;
+  }
+  var tHilang = 0;
+  function toast(teks) {
+    var t = document.getElementById("toast"); if (!t) return;
+    t.textContent = teks; t.hidden = false; t.classList.add("tampak");
+    clearTimeout(tHilang); tHilang = setTimeout(function () { t.classList.remove("tampak"); t.hidden = true; }, 2200);
+  }
+  function salinTeks(teks) {
+    var ok = function () { toast("Username Discord \"" + teks + "\" disalin."); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(teks).then(ok, function () { toast("Username Discord: " + teks); });
+    else toast("Username Discord: " + teks);
+  }
+  function tombolKontak(k, kelas) {
+    var isi = [ikon(k.ikon, 20), h("span", { class: "kontak-teks" }, h("strong", { text: k.nama }), kelas === "kontak-btn" ? h("small", { text: k.ket }) : null)];
+    if (k.salin) {
+      var b = h("button", { type: "button", class: kelas, "aria-label": "Salin username Discord " + k.salin }, isi);
+      b.addEventListener("click", function () { salinTeks(k.salin); });
+      return b;
+    }
+    return h("a", { class: kelas, href: k.href, target: "_blank", rel: "noopener" }, isi);
+  }
+  function panelKontak() {
+    var d = daftarKontak();
+    if (!d.length) return null;
+    return h("section", { class: "kontak-panel", "aria-labelledby": "h-kontak" },
+      h("div", {}, h("h2", { id: "h-kontak", text: "Ada pertanyaan sebelum order?" }), h("p", { text: "Tanyakan paket, jadwal, atau hal lain langsung ke admin." })),
+      h("div", { class: "kontak-baris" }, d.map(function (k) { return tombolKontak(k, "kontak-btn"); }))
+    );
+  }
+  function pasangKaki() {
+    var nav = document.getElementById("kakiKontak");
+    if (nav) nav.replaceChildren.apply(nav, daftarKontak().map(function (k) { return tombolKontak(k, "kaki-tautan"); }));
+    var wa = daftarKontak()[0];
+    if (wa && wa.nama === "WhatsApp" && !document.getElementById("fabWa")) {
+      var f = h("a", { id: "fabWa", class: "fab-wa", href: wa.href, target: "_blank", rel: "noopener", "aria-label": "Chat admin lewat WhatsApp" }, ikon("chat", 26));
+      document.body.append(f);
+    }
+  }
+
   /* ---------- Beranda ---------- */
   function pitaEl() {
     var kata = ["Joki rank", "Rawat akun", "Eksplorasi", "Story", "Build karakter", "Harga jelas"];
@@ -63,7 +109,6 @@
     var isi = h("div", { class: "tampil" },
       h("section", { class: "hero", "aria-labelledby": "h-hero" },
         h("div", { class: "hero-teks" },
-          h("span", { class: "lencana" }, h("span", { class: "titik-hidup", "aria-hidden": "true" }), "Joki & piloting service"),
           h1,
           h("p", { class: "lead", text: "Lihat daftar harga lengkap setiap game. Tiap paket dijelaskan apa saja yang termasuk." })
         ),
@@ -75,12 +120,7 @@
           h("span", { class: "sat s3" }, ikon("bolt", 22))
         )
       ),
-      pitaEl(),
-      h("ol", { class: "langkah" },
-        h("li", {}, ikon("gamepad", 22), h("div", {}, h("strong", { text: "Pilih game" }), h("small", { text: "Pilih game yang mau dijokikan" }))),
-        h("li", {}, ikon("list", 22), h("div", {}, h("strong", { text: "Cek harga" }), h("small", { text: "Lihat paket dan isinya" }))),
-        h("li", {}, ikon("chat", 22), h("div", {}, h("strong", { text: "Pesan" }), h("small", { text: C.WA_NOMOR ? "Langsung lewat WhatsApp" : "Tanyakan dulu sebelum order" })))
-      )
+      pitaEl()
     );
     if (!daftarGame.length) {
       isi.append(h("div", { class: "kosong" },
@@ -110,6 +150,7 @@
       isi.append(ul);
       pasangMiring(ul);
     }
+    var pk = panelKontak(); if (pk) isi.append(pk);
     tampilan.replaceChildren(isi);
   }
 
@@ -291,6 +332,7 @@
 
   function mulai() {
     document.getElementById("namaToko").firstChild.textContent = C.NAMA_TOKO;
+    pasangKaki();
     document.getElementById("sloganToko").textContent = C.SLOGAN || "";
     tampilan.replaceChildren(h("p", { class: "status", text: "Memuat daftar harga…" }));
     function ambilGame(s) { return data.pohon(s).filter(function (g) { return g.aktif !== false; }); }
