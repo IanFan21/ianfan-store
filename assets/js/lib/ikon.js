@@ -23,6 +23,8 @@
     discord: '<path d="M7.200 6.400c1.500-.7 3.100-1.100 4.800-1.100s3.300.4 4.800 1.100c1.700 2.600 2.600 5.300 2.800 8.600-1.200 1-2.600 1.600-4.100 2l-1-1.600c.5-.2 1-.4 1.400-.7-2.600 1.200-5.200 1.200-7.800 0 .4.300.9.500 1.400.7l-1 1.600c-1.500-.4-2.900-1-4.100-2 .2-3.300 1.100-6 2.800-8.600z"/><circle cx="9.400" cy="12.200" r="1.100" fill="currentColor"/><circle cx="14.600" cy="12.200" r="1.100" fill="currentColor"/>',
     salin: '<rect x="8.500" y="8.500" width="11" height="11" rx="2.500"/><path d="M15.500 8.500V6.500A2.500 2.500 0 0 0 13 4H6.500A2.500 2.500 0 0 0 4 6.500V13a2.500 2.500 0 0 0 2.500 2.500h2"/>',
     centang: '<path d="M5 12.500l4.500 4.500L19 7.500"/>',
+    bawah: '<path d="M6 9l6 6 6-6"/>',
+    titik3: '<circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/>',
     list: '<path d="M8 7h12M8 12h12M8 17h12"/><circle cx="4" cy="7" r="1" fill="currentColor"/><circle cx="4" cy="12" r="1" fill="currentColor"/><circle cx="4" cy="17" r="1" fill="currentColor"/>'
   };
 

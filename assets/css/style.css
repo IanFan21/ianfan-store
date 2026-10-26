@@ -304,3 +304,38 @@ dialog code { background: rgba(19, 40, 44, .08); padding: 1px 5px; border-radius
 .logo-pilihan { padding: 0; width: 52px; height: 52px; overflow: hidden; border: 2px solid transparent; border-radius: 12px; background: #fff; }
 .logo-pilihan:hover, .logo-pilihan:focus-visible { border-color: var(--ink); }
 .logo-pilihan img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* ---------- Admin: kategori dilipat, produk ringkas ---------- */
+h1[tabindex="-1"]:focus { outline: none; }
+.alat-admin { align-items: center; justify-content: space-between; gap: var(--s-sm) var(--s-md); }
+.alat-kiri, .alat-kanan { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-xs); }
+.alat-kanan { flex: 1 1 18rem; justify-content: flex-end; }
+#cari-admin { flex: 1 1 12rem; min-width: 0; min-height: 36px; padding: 0 var(--s-sm); border: 1px solid rgba(19, 40, 44, .4); border-radius: var(--radius); background: #fff; color: var(--teks-p); font-size: .9375rem; }
+#cari-admin:focus-visible { outline: 3px solid var(--ink); outline-offset: 1px; }
+details.kat-admin { padding-block: 0; border-top: 1px solid rgba(19, 40, 44, .22); }
+.kat-ringkas { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-xs) var(--s-sm); min-height: 56px; padding-block: var(--s-sm); cursor: pointer; list-style: none; }
+.kat-ringkas::-webkit-details-marker { display: none; }
+.kat-ringkas:focus-visible { outline: 3px solid var(--ink); outline-offset: -3px; }
+.kat-panah { width: 10px; height: 10px; flex: none; border-right: 2.5px solid var(--teks-p); border-bottom: 2.5px solid var(--teks-p); transform: rotate(-45deg); transition: transform .2s ease; margin-inline: 4px 6px; }
+details[open] > .kat-ringkas .kat-panah { transform: rotate(45deg); }
+.kat-nama { font-family: var(--font-display); font-size: 1.1875rem; font-weight: 700; letter-spacing: -.015em; }
+.tanda-habis { padding: 1px 8px; border: 1px solid var(--galat-p); border-radius: 999px; color: var(--galat-p); font-size: .75rem; font-weight: 700; }
+.kat-isi { padding: 0 0 var(--s-md) 0; }
+.kat-isi .kat-aksi { margin-bottom: var(--s-xs); }
+.kat-isi .tambah-prod { margin-top: var(--s-xs); }
+.baris-admin[hidden] { display: none; }
+/* saklar tersedia/habis */
+.saklar input { appearance: none; -webkit-appearance: none; position: relative; width: 40px; height: 22px; margin: 0; border-radius: 999px; background: #8a9893; transition: background-color .2s; }
+.saklar input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .2s; }
+.saklar input:checked { background: var(--ok-p); }
+.saklar input:checked::after { transform: translateX(18px); }
+.saklar input:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.saklar-teks { min-width: 4.5rem; }
+/* menu aksi lain */
+.lain { position: relative; }
+.lain > summary { list-style: none; cursor: pointer; }
+.lain > summary::-webkit-details-marker { display: none; }
+.lain-isi { position: absolute; right: 0; top: calc(100% + 4px); z-index: 10; display: flex; flex-direction: column; min-width: 12rem; padding: 6px; background: #fff; border: 1px solid rgba(19, 40, 44, .35); border-radius: 10px; box-shadow: 0 12px 28px -10px rgba(0, 0, 0, .45); }
+.lain-btn { min-height: 40px; padding: 0 var(--s-sm); border: 0; border-radius: 6px; background: none; color: var(--teks-p); font-size: .9375rem; font-weight: 600; text-align: left; }
+.lain-btn:hover, .lain-btn:focus-visible { background: var(--pasir-2); }
+.lain-bahaya { color: var(--galat-p); }

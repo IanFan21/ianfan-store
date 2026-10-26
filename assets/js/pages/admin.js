@@ -128,41 +128,97 @@
       )
     );
 
+    var cariAdm = h("input", { type: "search", id: "cari-admin", placeholder: "Cari produk di game ini", autocomplete: "off", "aria-label": "Cari produk di game ini" });
+    cariAdm.value = kataCari;
+    cariAdm.addEventListener("input", function () { kataCari = cariAdm.value; terapkanCari(); });
     var alat = h("div", { class: "alat-admin" },
-      h("button", { type: "button", class: "btn btn--ink btn--kecil", onclick: function () { bukaKat(null); } }, "Tambah kategori"),
-      h("button", { type: "button", class: "btn btn--ink btn--kecil", onclick: function () { bukaImpor(); } }, "Impor dari teks")
+      h("div", { class: "alat-kiri" },
+        h("button", { type: "button", class: "btn btn--ink btn--kecil", onclick: function () { bukaKat(null); } }, "+ Kategori"),
+        h("button", { type: "button", class: "btn btn--ink btn--kecil", onclick: function () { bukaImpor(); } }, "Impor dari teks")
+      ),
+      h("div", { class: "alat-kanan" },
+        cariAdm,
+        h("button", { type: "button", class: "btn btn--garis btn--kecil", onclick: function () { semuaBuka(true); } }, "Buka semua"),
+        h("button", { type: "button", class: "btn btn--garis btn--kecil", onclick: function () { semuaBuka(false); } }, "Tutup semua")
+      )
     );
 
     var isi = h("div", { class: "panel-admin" }, kepala, alat);
     if (!pg.kategori.length) {
       isi.append(h("p", { class: "kosong-kecil", text: "Game ini belum punya kategori. Tambah kategori atau impor dari teks." }));
     }
+    if (!(g.id in sudahInit)) { sudahInit[g.id] = true; if (pg.kategori[0]) terbuka[pg.kategori[0].id] = true; }
     pg.kategori.forEach(function (k, i) { isi.append(blokKategori(k, i, pg.kategori)); });
+    isi.append(h("p", { class: "kosong-kecil", id: "cari-kosong", hidden: true, text: "Tidak ada produk yang cocok dengan pencarian." }));
     area.replaceChildren(isi);
+    terapkanCari();
   }
+
+  /* Kategori dilipat supaya halaman tidak penuh; status buka/tutup diingat saat tampilan digambar ulang. */
+  var terbuka = {}, sudahInit = {}, kataCari = "";
+  function semuaBuka(buka) {
+    Array.prototype.forEach.call(document.querySelectorAll("details.kat-admin"), function (d) { d.open = buka; terbuka[d.dataset.id] = buka; });
+  }
+  function terapkanCari() {
+    var q = u.norm(kataCari);
+    Array.prototype.forEach.call(document.querySelectorAll("details.kat-admin"), function (d) {
+      var ada = 0;
+      Array.prototype.forEach.call(d.querySelectorAll(".baris-admin"), function (r) {
+        var cocok = !q || r.dataset.teks.indexOf(q) >= 0;
+        r.hidden = !cocok; if (cocok) ada++;
+      });
+      d.hidden = !!q && !ada;
+      if (q) d.open = ada > 0; else d.open = !!terbuka[d.dataset.id];
+    });
+    var kosong = document.getElementById("cari-kosong");
+    var tampak = document.querySelectorAll("details.kat-admin:not([hidden])").length;
+    if (kosong) kosong.hidden = !(q && !tampak);
+  }
+  document.addEventListener("click", function (e) {
+    Array.prototype.forEach.call(document.querySelectorAll("details.lain[open]"), function (d) { if (!d.contains(e.target)) d.open = false; });
+  });
 
   function blokKategori(k, i, semua) {
     var daftar = h("ul", { class: "daftar-prod" });
     k.produk.forEach(function (p, j) { daftar.append(barisProduk(p, j, k)); });
-    return h("section", { class: "kat-admin", "aria-label": "Kategori " + k.nama },
-      h("div", { class: "kat-kepala" },
-        h("h3", {}, k.nama, h("span", { class: "jml", text: " " + k.produk.length + " produk" })),
+    var habis = k.produk.filter(function (p) { return p.tersedia === false; }).length;
+    var d = h("details", { class: "kat-admin", "data-id": k.id },
+      h("summary", { class: "kat-ringkas" },
+        h("span", { class: "kat-panah", "aria-hidden": "true" }),
+        h("span", { class: "kat-nama", text: k.nama }),
+        h("span", { class: "jml", text: k.produk.length + " produk" }),
+        habis ? h("span", { class: "tanda-habis", text: habis + " habis" }) : null
+      ),
+      h("div", { class: "kat-isi" },
         h("div", { class: "kat-aksi" },
+          h("button", { type: "button", class: "btn btn--garis btn--kecil", onclick: function () { bukaKat(k); } }, "Ubah kategori"),
           ikonBtn("Naikkan kategori " + k.nama, SVG.atas, function () { geser("kategori", semua, i, -1); }),
           ikonBtn("Turunkan kategori " + k.nama, SVG.bawah, function () { geser("kategori", semua, i, 1); }),
-          h("button", { type: "button", class: "btn btn--garis btn--kecil", onclick: function () { bukaKat(k); } }, "Ubah"),
-          h("button", { type: "button", class: "btn btn--bahaya btn--kecil", onclick: function () { hapusKat(k); } }, "Hapus")
-        )
-      ),
-      k.ket ? h("p", { class: "ket-admin", text: k.ket }) : null,
-      daftar,
-      h("button", { type: "button", class: "btn btn--garis btn--kecil tambah-prod", onclick: function () { bukaProd(null, k); } }, "Tambah produk")
+          h("button", { type: "button", class: "btn btn--bahaya btn--kecil", onclick: function () { hapusKat(k); } }, "Hapus kategori")
+        ),
+        k.ket ? h("p", { class: "ket-admin", text: k.ket }) : null,
+        daftar,
+        h("button", { type: "button", class: "btn btn--ink btn--kecil tambah-prod", onclick: function () { bukaProd(null, k); } }, "+ Tambah produk")
+      )
     );
+    d.open = !!terbuka[k.id];
+    d.addEventListener("toggle", function () { if (!d.hidden && !u.norm(kataCari)) terbuka[k.id] = d.open; });
+    return d;
   }
 
   function barisProduk(p, j, k) {
     var tersedia = p.tersedia !== false;
-    return h("li", { class: "baris-admin" + (tersedia ? "" : " nonaktif") },
+    var teksSaklar = h("span", { class: "saklar-teks", text: tersedia ? "Tersedia" : "Habis" });
+    var lain = h("details", { class: "lain" },
+      h("summary", { class: "ikon-btn", "aria-label": "Aksi lain untuk " + p.nama, title: "Aksi lain" }),
+      h("div", { class: "lain-isi" },
+        h("button", { type: "button", class: "lain-btn", onclick: function () { geser("produk", k.produk, j, -1); } }, "Pindah ke atas"),
+        h("button", { type: "button", class: "lain-btn", onclick: function () { geser("produk", k.produk, j, 1); } }, "Pindah ke bawah"),
+        h("button", { type: "button", class: "lain-btn lain-bahaya", onclick: function () { hapusProd(p); } }, "Hapus produk")
+      )
+    );
+    lain.querySelector("summary").innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg>';
+    var li = h("li", { class: "baris-admin" + (tersedia ? "" : " nonaktif"), "data-teks": u.norm(p.nama + " " + (p.termasuk || "")) },
       h("div", { class: "baris-info" },
         h("p", { class: "nama-admin", text: p.nama }),
         h("p", { class: "harga-admin", text: ringkasHarga(p) }),
@@ -170,17 +226,16 @@
       ),
       h("div", { class: "baris-aksi" },
         h("label", { class: "saklar" },
-          h("input", { type: "checkbox", checked: tersedia ? true : false, onchange: function (e) {
+          h("input", { type: "checkbox", role: "switch", checked: tersedia ? true : false, onchange: function (e) {
             jalankan(data.simpan("produk", Object.assign({}, p, { tersedia: e.target.checked })).then(sentuh), e.target.checked ? "Ditandai tersedia." : "Ditandai habis.");
           } }),
-          h("span", { text: "Tersedia" })
+          teksSaklar
         ),
-        ikonBtn("Naikkan " + p.nama, SVG.atas, function () { geser("produk", k.produk, j, -1); }),
-        ikonBtn("Turunkan " + p.nama, SVG.bawah, function () { geser("produk", k.produk, j, 1); }),
         h("button", { type: "button", class: "btn btn--garis btn--kecil", onclick: function () { bukaProd(p, k); } }, "Ubah", h("span", { class: "sr-only", text: " " + p.nama })),
-        h("button", { type: "button", class: "btn btn--bahaya btn--kecil", onclick: function () { hapusProd(p); } }, "Hapus", h("span", { class: "sr-only", text: " " + p.nama }))
+        lain
       )
     );
+    return li;
   }
 
   /* Tukar urutan dengan tetangga. Selalu kirim baris utuh (database menolak baris parsial untuk baru). */

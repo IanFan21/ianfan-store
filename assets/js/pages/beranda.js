@@ -189,7 +189,8 @@
   }
 
   /* ---------- Halaman game ---------- */
-  function itemEl(p, g) {
+  var cacahIsi = 0;
+  function itemEl(p, g, bukaIsi) {
     var opsi = p.harga || [];
     var habis = p.tersedia === false;
     var li = h("li", { class: "item" + (habis ? " habis" : "") });
@@ -211,11 +212,27 @@
         ));
       });
     }
-    if (p.termasuk) li.append(h("p", { class: "termasuk", text: "Termasuk: " + p.termasuk }));
+    var aksi = h("div", { class: "item-aksi" });
+    var panel = null;
+    if (p.termasuk) {
+      var idIsi = "isi-" + (++cacahIsi);
+      panel = h("p", { class: "termasuk", id: idIsi, text: p.termasuk });
+      panel.hidden = !bukaIsi;
+      var tb = h("button", { type: "button", class: "isi-btn", "aria-expanded": bukaIsi ? "true" : "false", "aria-controls": idIsi }, h("span", { class: "isi-teks", text: bukaIsi ? "Tutup isi paket" : "Apa saja isinya?" }), ikon("bawah", 16));
+      tb.addEventListener("click", function () {
+        var buka = tb.getAttribute("aria-expanded") !== "true";
+        tb.setAttribute("aria-expanded", buka ? "true" : "false");
+        tb.querySelector(".isi-teks").textContent = buka ? "Tutup isi paket" : "Apa saja isinya?";
+        panel.hidden = !buka;
+      });
+      aksi.append(tb);
+    }
     if (C.WA_NOMOR && !habis) {
       var teks = "Halo " + C.NAMA_TOKO + ", saya mau pesan joki " + g.nama + ": " + p.nama + (opsi.length === 1 ? " (" + ringkasHarga(p) + ")" : "");
-      li.append(h("a", { class: "pesan", href: "https://wa.me/" + C.WA_NOMOR + "?text=" + encodeURIComponent(teks), target: "_blank", rel: "noopener" }, ikon("chat", 16), "Pesan lewat WhatsApp"));
+      aksi.append(h("a", { class: "pesan", href: "https://wa.me/" + C.WA_NOMOR + "?text=" + encodeURIComponent(teks), target: "_blank", rel: "noopener", "aria-label": "Pesan " + p.nama + " lewat WhatsApp" }, ikon("chat", 16), "Pesan"));
     }
+    if (aksi.children.length) li.append(aksi);
+    if (panel) li.append(panel);
     return li;
   }
 
@@ -227,8 +244,8 @@
     var kataTerbaru = g.diperbarui ? "Diperbarui " + u.tanggal(g.diperbarui) + " · " : "";
     var wadahBlok = h("div", { id: "blok-daftar" });
     var info = h("p", { class: "sr-only", role: "status", id: "info-cari" });
-    var chips = h("div", { class: "chip-nav", role: "group", "aria-label": "Lompat ke kategori" });
-    var input = h("input", { type: "search", id: "cari", placeholder: "Cari paket, misalnya Monthly", autocomplete: "off", "aria-label": "Cari paket" });
+    var chips = h("div", { class: "chip-nav", role: "group", "aria-label": "Pilih kategori" });
+    var input = h("input", { type: "search", id: "cari", placeholder: "Cari paket, contoh: Monthly", autocomplete: "off", "aria-label": "Cari paket" });
 
     var kepala = h("div", { class: "judul-game" },
       logoAman(g.logo) ? wadahLogo(g, 72, "logo-judul") : null,
@@ -245,19 +262,39 @@
       )
     );
 
+    var pilihKat = 0; /* indeks kategori yang tampil; -1 = semua */
     function isi(kata) {
       var k = u.norm(kata);
+      var semua = !!k || pilihKat < 0 || pilihKat >= g.kategori.length;
       wadahBlok.replaceChildren();
+      wadahBlok.classList.toggle("satu", !semua);
       chips.replaceChildren();
       var total = 0;
+      if (!k) {
+        var cs = h("button", { type: "button", class: "chip", "aria-pressed": semua ? "true" : "false", onclick: function () { pilihKat = -1; isi(""); } }, ikon("list", 16), "Semua", h("span", { class: "chip-n", text: String(semuaProduk(g).length) }));
+        chips.append(cs);
+      }
       g.kategori.forEach(function (kat, i) {
         var cocokKat = k && u.norm(kat.nama).indexOf(k) >= 0;
         var daftar = kat.produk.filter(function (p) {
           return !k || cocokKat || u.norm(p.nama).indexOf(k) >= 0 || u.norm(p.termasuk).indexOf(k) >= 0;
         });
         if (!daftar.length) return;
-        total += daftar.length;
         var idBlok = "kat-" + i;
+        if (!k) {
+          chips.append(h("button", { type: "button", class: "chip", "aria-pressed": (!semua && pilihKat === i) ? "true" : "false", onclick: function () {
+            pilihKat = i; isi("");
+            var atas = wadahBlok.getBoundingClientRect().top + window.scrollY - 150;
+            if (window.scrollY > atas) window.scrollTo({ top: atas, behavior: u.kurangGerak() ? "auto" : "smooth" });
+          } }, ikon(ik.untukKategori(kat.nama), 16), kat.nama, h("span", { class: "chip-n", text: String(kat.produk.length) })));
+        } else {
+          chips.append(h("button", { type: "button", class: "chip", "data-ke": idBlok, "aria-current": "false", onclick: function () {
+            var el = document.getElementById(idBlok);
+            if (el) el.scrollIntoView({ behavior: u.kurangGerak() ? "auto" : "smooth", block: "start" });
+          } }, ikon(ik.untukKategori(kat.nama), 16), kat.nama));
+        }
+        if (!semua && pilihKat !== i) return;
+        total += daftar.length;
         wadahBlok.append(h("section", { class: "blok", id: idBlok, "aria-labelledby": idBlok + "-h" },
           h("div", { class: "blok-kepala" },
             h("span", { class: "blok-ikon" }, ikon(ik.untukKategori(kat.nama), 24)),
@@ -265,12 +302,11 @@
             h("span", { class: "blok-jumlah", text: daftar.length + " paket" })
           ),
           kat.ket ? h("p", { class: "catatan", text: kat.ket }) : null,
-          h("ul", { class: "menu" }, daftar.map(function (p, n) { var li = itemEl(p, g); li.setAttribute("style", "--i:" + n); return li; }))
+          h("ul", { class: "menu" }, daftar.map(function (p, n) {
+            var cocokIsi = k && u.norm(p.nama).indexOf(k) < 0 && !cocokKat && u.norm(p.termasuk).indexOf(k) >= 0;
+            var li = itemEl(p, g, cocokIsi); li.setAttribute("style", "--i:" + n); return li;
+          }))
         ));
-        chips.append(h("button", { type: "button", class: "chip", "data-ke": idBlok, "aria-current": "false", onclick: function () {
-          var el = document.getElementById(idBlok);
-          if (el) el.scrollIntoView({ behavior: u.kurangGerak() ? "auto" : "smooth", block: "start" });
-        } }, ikon(ik.untukKategori(kat.nama), 16), kat.nama));
       });
       if (!total) {
         wadahBlok.append(h("div", { class: "kosong" },
@@ -279,7 +315,7 @@
         ));
       }
       info.textContent = k ? total + " paket ditemukan." : "";
-      pasangPengamat();
+      if (k) pasangPengamat(); else if (pengamat) { pengamat.disconnect(); pengamat = null; }
       pasangMuncul(Array.prototype.slice.call(wadahBlok.querySelectorAll(".blok")));
     }
 
