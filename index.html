@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="light">
 <title>IanFan Store: daftar harga joki game</title>
 <meta name="description" content="Daftar harga joki game IanFan Store. Pilih game, lihat paket dan harganya.">
-<meta name="theme-color" content="#060a18">
+<meta name="theme-color" content="#f3f5fb">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="assets/img/favicon.ico" sizes="48x48">
@@ -22,8 +22,9 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" href="assets/fonts/syne-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="assets/css/style.css?v=6">
-<link rel="stylesheet" href="assets/css/tema.css?v=6">
+<script src="assets/js/lib/tema.js?v=8"></script>
+<link rel="stylesheet" href="assets/css/style.css?v=8">
+<link rel="stylesheet" href="assets/css/tema.css?v=8">
 </head>
 <body class="publik">
 <canvas id="latar" aria-hidden="true"></canvas>
@@ -36,10 +37,13 @@
       <span class="merek-tanda" aria-hidden="true"><img src="assets/img/logo.svg" width="42" height="42" alt=""></span>
       <span class="merek-nama" id="namaToko">IanFan Store<span class="merek-ket" id="sloganToko">Daftar harga joki game</span></span>
     </a>
-    <a class="tautan-balik" id="tautanBalik" href="#/" hidden>
+    <div class="kepala-kanan">
+    <a class="tautan-balik" id="tautanBalik" href="#/" aria-label="Semua game" hidden>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
-      Semua game
+      <span class="tb-teks">Semua game</span>
     </a>
+      <button type="button" class="tombol-tema" id="tombolTema" aria-label="Ganti tema"></button>
+    </div>
   </div>
 </header>
 
@@ -56,11 +60,11 @@
 </footer>
 <div id="toast" class="toast-pub" role="status" aria-live="polite" hidden></div>
 
-<script src="assets/js/config/config.js?v=6"></script>
-<script src="assets/js/lib/util.js?v=6"></script>
-<script src="assets/js/lib/ikon.js?v=6"></script>
-<script src="assets/js/lib/latar.js?v=6" defer></script>
-<script src="assets/js/data/data.js?v=6"></script>
-<script src="assets/js/pages/beranda.js?v=6" defer></script>
+<script src="assets/js/config/config.js?v=8"></script>
+<script src="assets/js/lib/util.js?v=8"></script>
+<script src="assets/js/lib/ikon.js?v=8"></script>
+<script src="assets/js/lib/latar.js?v=8" defer></script>
+<script src="assets/js/data/data.js?v=8"></script>
+<script src="assets/js/pages/beranda.js?v=8" defer></script>
 </body>
 </html>

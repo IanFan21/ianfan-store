@@ -3,17 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="light">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#060a18">
+<meta name="theme-color" content="#f3f5fb">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="../assets/img/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="../assets/img/apple-touch-icon.png">
 <title>Admin | IanFan Store</title>
 <link rel="preload" href="../assets/fonts/syne-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="../assets/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../assets/css/style.css?v=6">
-<link rel="stylesheet" href="../assets/css/tema.css?v=6">
+<script src="../assets/js/lib/tema.js?v=8"></script>
+<link rel="stylesheet" href="../assets/css/style.css?v=8">
+<link rel="stylesheet" href="../assets/css/tema.css?v=8">
 </head>
 <body class="halaman-admin">
 <canvas id="latar" aria-hidden="true"></canvas>
@@ -25,9 +26,12 @@
       <span class="merek-tanda" aria-hidden="true"><img src="../assets/img/logo.svg" width="42" height="42" alt=""></span>
       <span class="merek-nama">Admin<span class="merek-ket" id="namaTokoAdmin">IanFan Store</span></span>
     </a>
+    <div class="kepala-kanan">
     <div class="kepala-aksi" id="aksiKepala" hidden>
       <a class="btn btn--terang btn--kecil" href="../" target="_blank" rel="noopener">Lihat situs</a>
       <button type="button" class="btn btn--terang btn--kecil" id="btn-keluar">Keluar</button>
+    </div>
+      <button type="button" class="tombol-tema" id="tombolTema" aria-label="Ganti tema"></button>
     </div>
   </div>
 </header>
@@ -172,12 +176,12 @@ TIDAK MASUK LIST   (semua di bawah baris ini diabaikan)</pre>
   </form>
 </dialog>
 
-<script src="../assets/js/config/config.js?v=6"></script>
-<script src="../assets/js/lib/util.js?v=6"></script>
-<script src="../assets/js/lib/impor.js?v=6"></script>
+<script src="../assets/js/config/config.js?v=8"></script>
+<script src="../assets/js/lib/util.js?v=8"></script>
+<script src="../assets/js/lib/impor.js?v=8"></script>
 <script src="../assets/js/lib/logo.js?v=1"></script>
-<script src="../assets/js/data/data.js?v=6"></script>
-<script src="../assets/js/lib/latar.js?v=6" defer></script>
-<script src="../assets/js/pages/admin.js?v=6" defer></script>
+<script src="../assets/js/data/data.js?v=8"></script>
+<script src="../assets/js/lib/latar.js?v=8" defer></script>
+<script src="../assets/js/pages/admin.js?v=8" defer></script>
 </body>
 </html>

@@ -8,6 +8,7 @@
   var hemat = (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) || (navigator.deviceMemory && navigator.deviceMemory <= 4) || (navigator.connection && navigator.connection.saveData);
   var aura = document.createElement("div"); aura.className = "aura"; aura.setAttribute("aria-hidden", "true"); document.body.prepend(aura);
 
+  function terang() { return document.documentElement.getAttribute("data-tema") !== "gelap"; }
   function acak(a, b) { return a + Math.random() * (b - a); }
 
   function ukur() {
@@ -31,7 +32,7 @@
 
   function gambar() {
     ctx.clearRect(0, 0, W, H);
-    var i, p, tinggi = H - hor;
+    var i, p, tinggi = H - hor, T = terang();
 
     /* lantai grid */
     var garis = hemat ? 10 : 14;
@@ -39,12 +40,12 @@
     for (i = 0; i < garis; i++) {
       var z = (i + (t % 1)) / garis;
       var y = hor + tinggi * Math.pow(z, 2.3);
-      ctx.strokeStyle = "rgba(56,240,255," + (0.03 + 0.2 * z).toFixed(3) + ")";
+      ctx.strokeStyle = T ? "rgba(63,51,214," + (0.02 + 0.13 * z).toFixed(3) + ")" : "rgba(56,240,255," + (0.03 + 0.2 * z).toFixed(3) + ")";
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
     }
     var tiang = hemat ? 12 : 20, lebar = Math.max(W, 900) * 0.2;
     var g = ctx.createLinearGradient(0, hor, 0, H);
-    g.addColorStop(0, "rgba(143,107,255,0)"); g.addColorStop(1, "rgba(143,107,255,.28)");
+    g.addColorStop(0, T ? "rgba(124,58,237,0)" : "rgba(143,107,255,0)"); g.addColorStop(1, T ? "rgba(124,58,237,.16)" : "rgba(143,107,255,.28)");
     ctx.strokeStyle = g;
     for (i = -tiang / 2; i <= tiang / 2; i++) {
       ctx.beginPath(); ctx.moveTo(W / 2 + i * W * 0.012, hor); ctx.lineTo(W / 2 + i * lebar * 0.55, H); ctx.stroke();
@@ -54,7 +55,7 @@
     for (i = 0; i < parts.length; i++) {
       p = parts[i];
       var kerlip = 0.6 + 0.4 * Math.sin(t * 2 + p.f);
-      var warna = "hsla(" + p.h + ",100%,70%," + (p.a * kerlip).toFixed(3) + ")";
+      var warna = T ? "hsla(" + (p.h === 188 ? 232 : 262) + ",70%,50%," + (p.a * kerlip * 0.45).toFixed(3) + ")" : "hsla(" + p.h + ",100%,70%," + (p.a * kerlip).toFixed(3) + ")";
       if (p.chev) chevron(p.x, p.y, p.s, warna);
       else { ctx.fillStyle = warna; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.2832); ctx.fill(); }
       if (!kurang) {
@@ -80,6 +81,7 @@
     window.addEventListener("resize", function () { clearTimeout(tunda); tunda = setTimeout(function () { ukur(); gambar(); }, 150); });
     document.addEventListener("visibilitychange", function () { document.hidden ? henti() : jalan(); });
     jalan();
+    window.addEventListener("ianfan-tema", function () { gambar(); });
   }
 
   /* cahaya mengikuti kursor (hanya perangkat dengan kursor halus) */

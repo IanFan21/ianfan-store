@@ -49,7 +49,8 @@
     var k = [];
     if (C.WA_NOMOR) k.push({ nama: "WhatsApp", ikon: "chat", ket: "Tanya harga & order", href: "https://wa.me/" + C.WA_NOMOR + "?text=" + encodeURIComponent("Halo " + C.NAMA_TOKO + ", saya mau tanya harga joki.") });
     if (C.FB_URL) k.push({ nama: "Facebook", ikon: "facebook", ket: "Lihat profil", href: C.FB_URL });
-    if (C.DISCORD) k.push({ nama: "Discord", ikon: "discord", ket: C.DISCORD, salin: C.DISCORD });
+    if (C.DISCORD_URL) k.push({ nama: "Discord", ikon: "discord", ket: C.DISCORD || "Kirim pesan", href: C.DISCORD_URL });
+    else if (C.DISCORD) k.push({ nama: "Discord", ikon: "discord", ket: C.DISCORD, salin: C.DISCORD });
     return k;
   }
   var tHilang = 0;
@@ -72,6 +73,41 @@
     }
     return h("a", { class: kelas, href: k.href, target: "_blank", rel: "noopener" }, isi);
   }
+  /* Pilihan kanal untuk tombol "Pesan". WhatsApp bisa langsung membawa isi pesan; Facebook/Discord tidak,
+     jadi teks pesan disalin ke papan klip dan pelanggan tinggal menempelkannya di chat. */
+  function kanalPesan(teks) {
+    var d = [];
+    if (C.WA_NOMOR) d.push({ nama: "WhatsApp", ikon: "chat", ket: "Pesan langsung terisi", href: "https://wa.me/" + C.WA_NOMOR + "?text=" + encodeURIComponent(teks) });
+    var fb = C.FB_CHAT || C.FB_URL;
+    if (fb) d.push({ nama: "Facebook Messenger", ikon: "facebook", ket: "Pesan akan disalin, tinggal tempel", href: fb, salinTeks: teks });
+    if (C.DISCORD_URL) d.push({ nama: "Discord", ikon: "discord", ket: "Pesan akan disalin, tinggal tempel", href: C.DISCORD_URL, salinTeks: teks });
+    return d;
+  }
+  var dlgPesan = null;
+  function bukaPesan(namaPaket, harga, teks) {
+    if (!dlgPesan) {
+      dlgPesan = h("dialog", { class: "dlg-pesan", "aria-labelledby": "dlg-pesan-h" });
+      dlgPesan.addEventListener("click", function (e) { if (e.target === dlgPesan) dlgPesan.close(); });
+      document.body.append(dlgPesan);
+    }
+    var tutup = h("button", { type: "button", class: "pesan-tutup" }, "Batal");
+    tutup.addEventListener("click", function () { dlgPesan.close(); });
+    var pilihan = h("div", { class: "pesan-pilihan" }, kanalPesan(teks).map(function (k) {
+      var a = h("a", { class: "pilih-kontak", href: k.href, target: "_blank", rel: "noopener" }, ikon(k.ikon, 22), h("span", {}, h("strong", { text: k.nama }), h("small", { text: k.ket })));
+      a.addEventListener("click", function () {
+        if (k.salinTeks && navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(k.salinTeks).then(function () { toast("Pesan disalin. Tempel di chat."); }, function () {});
+        dlgPesan.close();
+      });
+      return a;
+    }));
+    dlgPesan.replaceChildren(
+      h("h2", { id: "dlg-pesan-h", text: "Pesan lewat mana?" }),
+      h("p", { class: "pesan-ringkas" }, "Paket ", h("strong", { text: namaPaket }), harga ? " · " + harga : ""),
+      pilihan, tutup
+    );
+    if (dlgPesan.showModal) dlgPesan.showModal(); else dlgPesan.setAttribute("open", "");
+  }
+
   function panelKontak() {
     var d = daftarKontak();
     if (!d.length) return null;
@@ -227,9 +263,17 @@
       });
       aksi.append(tb);
     }
-    if (C.WA_NOMOR && !habis) {
+    if (!habis && kanalPesan("").length) {
       var teks = "Halo " + C.NAMA_TOKO + ", saya mau pesan joki " + g.nama + ": " + p.nama + (opsi.length === 1 ? " (" + ringkasHarga(p) + ")" : "");
-      aksi.append(h("a", { class: "pesan", href: "https://wa.me/" + C.WA_NOMOR + "?text=" + encodeURIComponent(teks), target: "_blank", rel: "noopener", "aria-label": "Pesan " + p.nama + " lewat WhatsApp" }, ikon("chat", 16), "Pesan"));
+      var kanal = kanalPesan(teks);
+      var lab = "Pesan " + p.nama;
+      if (kanal.length === 1) {
+        aksi.append(h("a", { class: "pesan", href: kanal[0].href, target: "_blank", rel: "noopener", "aria-label": lab }, ikon(kanal[0].ikon, 16), "Pesan"));
+      } else {
+        var bp = h("button", { type: "button", class: "pesan", "aria-label": lab, "aria-haspopup": "dialog" }, ikon("chat", 16), "Pesan");
+        bp.addEventListener("click", function () { bukaPesan(p.nama, opsi.length === 1 ? ringkasHarga(p) : "", teks); });
+        aksi.append(bp);
+      }
     }
     if (aksi.children.length) li.append(aksi);
     if (panel) li.append(panel);

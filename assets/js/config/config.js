@@ -12,7 +12,9 @@ window.IFS.CONFIG = {
 
   /* Kontak lain. Kosongkan salah satu untuk menyembunyikannya. */
   FB_URL: "https://www.facebook.com/ianfan.xbayu/",
+  FB_CHAT: "https://m.me/ianfan.xbayu",   /* tombol "Pesan" lewat Messenger */
   DISCORD: "ianfan",
+  DISCORD_URL: "https://discordapp.com/users/451683810505916416",
   DOMAIN: "https://ianfanstore.my.id",
 
   /* Database. Kosong = mode lokal (data dari folder data/, hasil edit admin hanya tersimpan di browser ini). */
