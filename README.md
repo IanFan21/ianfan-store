@@ -1,4 +1,13 @@
 # IanFan Store – daftar harga joki
+## Tentang proyek ini
+
+IanFan Store adalah website daftar harga jasa joki game. Pelanggan membuka situs, memilih game, melihat paket beserta harganya, lalu memesan lewat WhatsApp. Pemilik toko login di halaman /admin/ untuk menambah atau mengubah game, kategori, produk, dan harga — perubahan tersimpan di database Supabase sehingga langsung terlihat oleh semua pelanggan.
+
+Saat ini situs memuat satu game: Honkai: Star Rail (joki akun, rawat akun, eksplorasi, story, dan lainnya).
+
+Situs live: https://ianfan21.github.io/ianfan-store/
+
+Teknologi: situs statis (HTML, CSS, JavaScript) yang di-host gratis lewat GitHub Pages, dengan Supabase sebagai database toko.
 
 Website statis (GitHub Pages). Pelanggan hanya melihat harga; pemilik login di `/admin/` untuk tambah/ubah game, kategori, produk, dan harga.
 
