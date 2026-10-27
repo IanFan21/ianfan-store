@@ -1,12 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="IanFan Store">
-  <defs>
-    <linearGradient id="g" x1="6" y1="4" x2="58" y2="60" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#38f0ff"/>
-      <stop offset="1" stop-color="#8f6bff"/>
-    </linearGradient>
-  </defs>
-  <rect width="64" height="64" rx="16" fill="url(#g)"/>
-  <rect x="12" y="14" width="9" height="36" rx="2" fill="#060a18"/>
-  <path d="M28 14h26l-7 9H37v5h12l-6 8H37v14h-9z" fill="#060a18"/>
-  <path d="M49 40l5 5-5 5-5-5z" fill="#ffb23e"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <rect width="256" height="256" rx="52" fill="#000000"/>
+  <text x="131" y="182" text-anchor="middle" font-family="Arial Black, Archivo Black, sans-serif" font-size="150" font-weight="900" font-style="italic" letter-spacing="-6"><tspan fill="#F5F5F5">I</tspan><tspan fill="#A855F7">F</tspan></text>
 </svg>
