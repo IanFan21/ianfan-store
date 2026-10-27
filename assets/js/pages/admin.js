@@ -546,7 +546,7 @@
     if (!email || !sandi) { galat.textContent = "Isi email dan kata sandi."; return; }
     var b = $("btn-masuk");
     b.disabled = true;
-    data.masuk(email, sandi).then(function (s) {
+    data.masuk(email, sandi, window.turnstile ? window.turnstile.getResponse() : "").then(function (s) {
       $("sandi").value = "";
       if (s.masuk) mulaiAdmin(); else galat.textContent = "Akun ini tidak punya akses admin.";
     }, function (err) { galat.textContent = err.message || "Gagal masuk. Coba lagi."; }).then(function () { b.disabled = false; });
