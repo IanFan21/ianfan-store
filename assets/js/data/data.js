@@ -174,9 +174,9 @@
         });
       });
     },
-    masuk: function (email, sandi) {
+    masuk: function (email, sandi, captchaToken) {
       if (!pakaiSupabase) return Promise.resolve({ masuk: true, lokal: true });
-      return klienSiap().then(function (c) { return c.auth.signInWithPassword({ email: email, password: sandi }); }).then(function (r) {
+      return klienSiap().then(function (c) { return c.auth.signInWithPassword({ email: email, password: sandi, options: { captchaToken: captchaToken } }); }).then(function (r) {
         if (r.error) throw new Error("Email atau kata sandi salah.");
         return data.sesi();
       });
