@@ -6,7 +6,7 @@
   function terapkan(t) {
     akar.setAttribute("data-tema", t);
     var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute("content", t === "gelap" ? "#060a18" : "#f3f5fb");
-    var c = document.querySelector('meta[name="color-scheme"]'); if (c) c.setAttribute("content", t);
+    var c = document.querySelector('meta[name="color-scheme"]'); if (c) c.setAttribute("content", t === "gelap" ? "dark" : "light");
     window.dispatchEvent(new CustomEvent("ianfan-tema", { detail: t }));
   }
   terapkan(baca());

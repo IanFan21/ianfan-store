@@ -84,22 +84,6 @@
     window.addEventListener("ianfan-tema", function () { gambar(); });
   }
 
-  /* cahaya mengikuti kursor (hanya perangkat dengan kursor halus) */
-  if (!kurang && window.matchMedia && matchMedia("(pointer:fine)").matches) {
-    var tx = 0.5, ty = 0.3, cx = 0.5, cy = 0.3, rafM = 0;
-    var akar = aura;
-    window.addEventListener("pointermove", function (e) {
-      tx = e.clientX / window.innerWidth; ty = e.clientY / window.innerHeight;
-      if (!rafM) rafM = requestAnimationFrame(ikuti);
-    }, { passive: true });
-    var ikuti = function () {
-      cx += (tx - cx) * 0.08; cy += (ty - cy) * 0.08;
-      akar.style.setProperty("--mx", (cx * 100).toFixed(1) + "%");
-      akar.style.setProperty("--my", (cy * 100).toFixed(1) + "%");
-      rafM = (Math.abs(tx - cx) + Math.abs(ty - cy) > 0.002) ? requestAnimationFrame(ikuti) : 0;
-    };
-  }
-
   /* bilah progres gulir */
   var bar = document.getElementById("progres");
   if (bar) {

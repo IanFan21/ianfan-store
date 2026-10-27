@@ -9,7 +9,6 @@
   var tampilan = document.getElementById("tampilan");
   var tautanBalik = document.getElementById("tautanBalik");
   var daftarGame = null;
-  var pengamat = null;
 
   var ik = IFS.ikon;
   function ikon(nama, ukuran, kelas) { return ik.el(nama, ukuran, kelas); }
@@ -31,14 +30,15 @@
   function semuaProduk(g) {
     return g.kategori.reduce(function (a, k) { return a.concat(k.produk); }, []);
   }
-  function hargaTermurah(g) {
+  function opsiTermurah(daftar) {
     var m = null;
-    semuaProduk(g).forEach(function (p) {
+    daftar.forEach(function (p) {
       if (p.tersedia === false) return;
-      (p.harga || []).forEach(function (o) { if (m === null || o.min < m) m = o.min; });
+      (p.harga || []).forEach(function (o) { if (m === null || o.min < m.min) m = o; });
     });
     return m;
   }
+  function teksMulai(o) { return o ? u.rupiah(o.min) + (o.satuan ? o.satuan : "") : ""; }
   function ringkasHarga(p) {
     var o = (p.harga || [])[0];
     return o ? u.teksHarga(o) : "";
@@ -77,33 +77,61 @@
      jadi teks pesan disalin ke papan klip dan pelanggan tinggal menempelkannya di chat. */
   function kanalPesan(teks) {
     var d = [];
-    if (C.WA_NOMOR) d.push({ nama: "WhatsApp", ikon: "chat", ket: "Pesan langsung terisi", href: "https://wa.me/" + C.WA_NOMOR + "?text=" + encodeURIComponent(teks) });
+    if (C.WA_NOMOR) d.push({ id: "wa", nama: "WhatsApp", ikon: "chat", ket: "Pesan langsung terisi", href: "https://wa.me/" + C.WA_NOMOR + "?text=" + encodeURIComponent(teks) });
     var fb = C.FB_CHAT || C.FB_URL;
-    if (fb) d.push({ nama: "Facebook Messenger", ikon: "facebook", ket: "Pesan akan disalin, tinggal tempel", href: fb, salinTeks: teks });
-    if (C.DISCORD_URL) d.push({ nama: "Discord", ikon: "discord", ket: "Pesan akan disalin, tinggal tempel", href: C.DISCORD_URL, salinTeks: teks });
+    if (fb) d.push({ id: "fb", nama: "Facebook Messenger", ikon: "facebook", ket: "Pesan akan disalin, tinggal tempel", href: fb, salinTeks: teks });
+    if (C.DISCORD_URL) d.push({ id: "dc", nama: "Discord", ikon: "discord", ket: "Pesan akan disalin, tinggal tempel", href: C.DISCORD_URL, salinTeks: teks });
     return d;
   }
+  function teksPesan(g, kat, p, o) {
+    var b = ["Halo " + C.NAMA_TOKO + ", saya mau pesan:", "- " + (g.kode || g.nama) + " · " + kat.nama + ": " + p.nama];
+    if (o) b.push("  (" + (o.label ? o.label + ", " : "") + u.teksHarga(o) + ")");
+    b.push("", "UID:", "Server:", "Catatan:");
+    return b.join("\n");
+  }
   var dlgPesan = null;
-  function bukaPesan(namaPaket, harga, teks) {
+  function bukaPesan(g, kat, p) {
     if (!dlgPesan) {
       dlgPesan = h("dialog", { class: "dlg-pesan", "aria-labelledby": "dlg-pesan-h" });
       dlgPesan.addEventListener("click", function (e) { if (e.target === dlgPesan) dlgPesan.close(); });
       document.body.append(dlgPesan);
     }
-    var tutup = h("button", { type: "button", class: "pesan-tutup" }, "Batal");
-    tutup.addEventListener("click", function () { dlgPesan.close(); });
-    var pilihan = h("div", { class: "pesan-pilihan" }, kanalPesan(teks).map(function (k) {
+    var opsi = p.harga || [];
+    var pilih = 0;
+    var teks = teksPesan(g, kat, p, opsi[0]);
+    var kanal = kanalPesan(teks);
+    var tautan = {};
+    var pilihan = h("div", { class: "pesan-pilihan" });
+    kanal.forEach(function (k) {
       var a = h("a", { class: "pilih-kontak", href: k.href, target: "_blank", rel: "noopener" }, ikon(k.ikon, 22), h("span", {}, h("strong", { text: k.nama }), h("small", { text: k.ket })));
       a.addEventListener("click", function () {
-        if (k.salinTeks && navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(k.salinTeks).then(function () { toast("Pesan disalin. Tempel di chat."); }, function () {});
+        if (k.salinTeks && navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(teks).then(function () { toast("Pesan disalin. Tempel di chat."); }, function () {});
         dlgPesan.close();
       });
-      return a;
-    }));
+      tautan[k.id] = a; pilihan.append(a);
+    });
+    function segarkan() {
+      teks = teksPesan(g, kat, p, opsi[pilih]);
+      if (tautan.wa) tautan.wa.href = "https://wa.me/" + C.WA_NOMOR + "?text=" + encodeURIComponent(teks);
+    }
+    var grupOpsi = null;
+    if (opsi.length > 1) {
+      grupOpsi = h("fieldset", { class: "pesan-opsi" }, h("legend", { text: "Pilih yang mana?" }));
+      opsi.forEach(function (o, i) {
+        var r = h("input", { type: "radio", name: "opsi-harga", value: String(i) });
+        if (i === 0) r.checked = true;
+        r.addEventListener("change", function () { pilih = i; segarkan(); });
+        grupOpsi.append(h("label", { class: "opsi-radio" }, r, h("span", { class: "opsi-radio-nama", text: o.label || (o.satuan ? "Per " + String(o.satuan).replace(/^\//, "") : "Harga") }), h("span", { class: "opsi-radio-harga", text: u.teksHarga(o) })));
+      });
+    }
+    var tutup = h("button", { type: "button", class: "pesan-tutup" }, "Batal");
+    tutup.addEventListener("click", function () { dlgPesan.close(); });
     dlgPesan.replaceChildren(
       h("h2", { id: "dlg-pesan-h", text: "Pesan lewat mana?" }),
-      h("p", { class: "pesan-ringkas" }, "Paket ", h("strong", { text: namaPaket }), harga ? " · " + harga : ""),
-      pilihan, tutup
+      h("p", { class: "pesan-ringkas" }, "Paket ", h("strong", { text: p.nama }), opsi.length === 1 ? " · " + u.teksHarga(opsi[0]) : ""),
+      grupOpsi, pilihan,
+      h("p", { class: "pesan-catatan", text: "Isi UID dan server di chat. Harga final, estimasi waktu, dan cara bayar dikonfirmasi admin sebelum pengerjaan." }),
+      tutup
     );
     if (dlgPesan.showModal) dlgPesan.showModal(); else dlgPesan.setAttribute("open", "");
   }
@@ -116,7 +144,35 @@
       h("div", { class: "kontak-baris" }, d.map(function (k) { return tombolKontak(k, "kontak-btn"); }))
     );
   }
+  var INFO_BAWAAN = [
+    { j: "Cara order", i: "1. Pilih game dan paket, lalu tekan Pesan.\n2. Pilih WhatsApp, Facebook, atau Discord.\n3. Admin mengonfirmasi harga, estimasi waktu, dan cara bayar di chat.\n4. Setelah sepakat, pengerjaan dimulai." },
+    { j: "Keamanan akun", i: "Setiap order dikerjakan manual oleh admin sendiri. Kirim data login hanya lewat chat pribadi dengan admin, jangan di tempat umum." },
+    { j: "Cara bayar, estimasi, dan garansi", i: "Dibahas langsung di chat sebelum pengerjaan karena tiap akun dan paket berbeda. Tanyakan apa saja yang ingin kamu pastikan." }
+  ];
+  function blokInfo() {
+    var daftar = (C.INFO && C.INFO.length) ? C.INFO : INFO_BAWAAN;
+    return h("section", { class: "sebelum-order", "aria-labelledby": "h-info" },
+      h("h2", { id: "h-info", text: "Sebelum order" }),
+      h("div", { class: "info-daftar" }, daftar.map(function (x) {
+        return h("details", { class: "info-item" }, h("summary", {}, h("span", { text: x.j }), ikon("bawah", 18)), h("p", { text: x.i }));
+      }))
+    );
+  }
+  function bawahHalaman(wadah) {
+    wadah.append(blokInfo());
+    var pk = panelKontak(); if (pk) wadah.append(pk);
+  }
   function pasangKaki() {
+    if (!document.getElementById("keAtas")) {
+      var ka = h("button", { id: "keAtas", type: "button", class: "ke-atas", "aria-label": "Kembali ke atas", hidden: true }, ikon("rank", 22));
+      ka.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: u.kurangGerak() ? "auto" : "smooth" }); });
+      document.body.append(ka);
+      var tunggu = false;
+      window.addEventListener("scroll", function () {
+        if (tunggu) return; tunggu = true;
+        requestAnimationFrame(function () { tunggu = false; ka.hidden = window.scrollY < window.innerHeight * 1.5; });
+      }, { passive: true });
+    }
     var nav = document.getElementById("kakiKontak");
     if (nav) nav.replaceChildren.apply(nav, daftarKontak().map(function (k) { return tombolKontak(k, "kaki-tautan"); }));
     var wa = daftarKontak()[0];
@@ -127,36 +183,25 @@
   }
 
   /* ---------- Beranda ---------- */
-  function pitaEl() {
-    var kata = ["Joki rank", "Rawat akun", "Eksplorasi", "Story", "Build karakter", "Harga jelas"];
-    var baris = h("div", { class: "pita-isi" });
-    for (var r = 0; r < 4; r++) kata.forEach(function (k) { baris.append(h("span", { text: k })); });
-    return h("div", { class: "pita", "aria-hidden": "true" }, baris);
-  }
-
   function renderBeranda() {
     document.title = C.NAMA_TOKO + ": daftar harga joki game";
     tautanBalik.hidden = true;
-    var kataJudul = ["Pilih", "game", "yang", "mau", "dijokikan."];
-    var h1 = h("h1", { id: "h-hero", "aria-label": kataJudul.join(" ") });
-    kataJudul.forEach(function (k, i) {
-      h1.append(h("span", { class: "kata" + (i === kataJudul.length - 1 ? " neon" : ""), style: "--k:" + i, "aria-hidden": "true", text: k }), " ");
-    });
+    var nama = daftarGame.map(function (g) { return g.kode || g.nama; });
+    var judulGame = nama.length > 1 ? nama.slice(0, -1).join(", ") + " & " + nama[nama.length - 1] : nama[0];
+    var h1 = h("h1", { id: "h-hero" }, judulGame ? "Joki " + judulGame + ", " : "Daftar harga joki game", judulGame ? h("span", { class: "neon", text: "dikerjakan manual." }) : null);
     var isi = h("div", { class: "tampil" },
       h("section", { class: "hero", "aria-labelledby": "h-hero" },
         h("div", { class: "hero-teks" },
           h1,
-          h("p", { class: "lead", text: "Lihat daftar harga lengkap setiap game. Tiap paket dijelaskan apa saja yang termasuk." })
+          h("p", { class: "lead", text: "Pilih game, lihat harga tiap paket, lalu pesan lewat WhatsApp, Facebook, atau Discord. Harga final, estimasi waktu, dan cara bayar dikonfirmasi admin di chat sebelum pengerjaan." })
         ),
         h("div", { class: "hud", "aria-hidden": "true" },
-          h("span", { class: "cincin" }), h("span", { class: "cincin" }), h("span", { class: "cincin" }),
+          h("span", { class: "cincin" }), h("span", { class: "cincin" }),
           h("span", { class: "inti" }, ikon("gamepad", 44)),
           h("span", { class: "sat s1" }, ikon("rank", 22)),
-          h("span", { class: "sat s2" }, ikon("shield", 22)),
-          h("span", { class: "sat s3" }, ikon("bolt", 22))
+          h("span", { class: "sat s2" }, ikon("shield", 22))
         )
-      ),
-      pitaEl()
+      )
     );
     if (!daftarGame.length) {
       isi.append(h("div", { class: "kosong" },
@@ -167,7 +212,7 @@
       var ul = h("ul", { class: "grid-game" });
       daftarGame.forEach(function (g) {
         var n = semuaProduk(g).length;
-        var mulai = hargaTermurah(g);
+        var mulai = opsiTermurah(semuaProduk(g));
         ul.append(h("li", {},
           h("a", { class: "kartu-game", href: "#/game/" + g.slug },
             h("div", { class: "kartu-atas" },
@@ -177,56 +222,21 @@
             h("h2", { text: g.nama }),
             g.subjudul ? h("p", { class: "kartu-sub", text: g.subjudul }) : null,
             h("div", { class: "kartu-meta" },
-              h("span", {}, n + " paket", mulai !== null ? [" · mulai ", h("strong", { text: u.rupiah(mulai) })] : null),
+              h("span", {}, n + " paket", mulai ? [" · mulai ", h("strong", { text: teksMulai(mulai) })] : null),
               h("span", { class: "kartu-lihat" }, "Lihat harga", ikon("arrow", 16))
             )
           )
         ));
       });
       isi.append(ul);
-      pasangMiring(ul);
     }
-    var pk = panelKontak(); if (pk) isi.append(pk);
+    bawahHalaman(isi);
     tampilan.replaceChildren(isi);
-  }
-
-  /* Kartu miring mengikuti kursor + sorot cahaya (hanya kursor halus, tanpa pengurangan gerak) */
-  function pasangMiring(ul) {
-    if (u.kurangGerak() || !window.matchMedia || !matchMedia("(pointer:fine)").matches) return;
-    ul.addEventListener("pointermove", function (e) {
-      var k = e.target.closest ? e.target.closest(".kartu-game") : null;
-      if (!k) return;
-      var r = k.getBoundingClientRect();
-      var x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
-      k.style.setProperty("--ry", ((x - 0.5) * 8).toFixed(2) + "deg");
-      k.style.setProperty("--rx", ((0.5 - y) * 6).toFixed(2) + "deg");
-      k.style.setProperty("--px", (x * 100).toFixed(1) + "%");
-      k.style.setProperty("--py", (y * 100).toFixed(1) + "%");
-    });
-    ul.addEventListener("pointerout", function (e) {
-      var k = e.target.closest ? e.target.closest(".kartu-game") : null;
-      if (k) { k.style.setProperty("--rx", "0deg"); k.style.setProperty("--ry", "0deg"); }
-    });
-  }
-
-  /* Blok muncul saat digulir. Kelas "tunda" dipasang oleh skrip ini sendiri, jadi tanpa skrip semuanya tetap terlihat. */
-  var pengamatMasuk = null;
-  function pasangMuncul(daftar) {
-    if (pengamatMasuk) pengamatMasuk.disconnect();
-    if (u.kurangGerak() || !("IntersectionObserver" in window)) return;
-    pengamatMasuk = new IntersectionObserver(function (entri) {
-      entri.forEach(function (e) {
-        if (!e.isIntersecting) return;
-        e.target.classList.add("masuk");
-        pengamatMasuk.unobserve(e.target);
-      });
-    }, { rootMargin: "0px 0px -8% 0px" });
-    daftar.forEach(function (el) { el.classList.add("tunda"); pengamatMasuk.observe(el); });
   }
 
   /* ---------- Halaman game ---------- */
   var cacahIsi = 0;
-  function itemEl(p, g, bukaIsi) {
+  function itemEl(p, g, kat, bukaIsi) {
     var opsi = p.harga || [];
     var habis = p.tersedia === false;
     var li = h("li", { class: "item" + (habis ? " habis" : "") });
@@ -264,14 +274,13 @@
       aksi.append(tb);
     }
     if (!habis && kanalPesan("").length) {
-      var teks = "Halo " + C.NAMA_TOKO + ", saya mau pesan joki " + g.nama + ": " + p.nama + (opsi.length === 1 ? " (" + ringkasHarga(p) + ")" : "");
-      var kanal = kanalPesan(teks);
+      var kanal = kanalPesan(teksPesan(g, kat, p, opsi[0]));
       var lab = "Pesan " + p.nama;
-      if (kanal.length === 1) {
+      if (kanal.length === 1 && opsi.length <= 1) {
         aksi.append(h("a", { class: "pesan", href: kanal[0].href, target: "_blank", rel: "noopener", "aria-label": lab }, ikon(kanal[0].ikon, 16), "Pesan"));
       } else {
         var bp = h("button", { type: "button", class: "pesan", "aria-label": lab, "aria-haspopup": "dialog" }, ikon("chat", 16), "Pesan");
-        bp.addEventListener("click", function () { bukaPesan(p.nama, opsi.length === 1 ? ringkasHarga(p) : "", teks); });
+        bp.addEventListener("click", function () { bukaPesan(g, kat, p); });
         aksi.append(bp);
       }
     }
@@ -335,7 +344,7 @@
       h("span", { class: "kode", "aria-hidden": "true", text: g.kode || g.nama.slice(0, 3).toUpperCase() }),
       h("div", {},
         h("h1", { id: "h-game", text: g.nama }),
-        h("p", { class: "meta-game", text: kataTerbaru + n + " paket" })
+        h("p", { class: "meta-game", text: kataTerbaru + n + " paket · dikerjakan manual oleh admin" })
       )
     );
     var alat = h("div", { class: "alat" },
@@ -345,51 +354,53 @@
       )
     );
 
-    var pilihKat = 0; /* indeks kategori yang tampil; -1 = semua */
+    /* Semua kategori terlihat sebagai baris yang bisa dibuka (gambaran seluruh katalog), tidak langsung penuh. */
+    var terbuka = {};
+    if (g.kategori.length) terbuka[0] = true;
+    if (g.kategori.length <= 2) g.kategori.forEach(function (_, i) { terbuka[i] = true; });
     function isi(kata) {
       var k = u.norm(kata);
-      var semua = !!k || pilihKat < 0 || pilihKat >= g.kategori.length;
       wadahBlok.replaceChildren();
-      wadahBlok.classList.toggle("satu", !semua);
       chips.replaceChildren();
       var total = 0;
-      if (!k) {
-        var cs = h("button", { type: "button", class: "chip", "aria-pressed": semua ? "true" : "false", onclick: function () { pilihKat = -1; isi(""); } }, ikon("list", 16), "Semua", h("span", { class: "chip-n", text: String(semuaProduk(g).length) }));
-        chips.append(cs);
-      }
+      var semuaChip = h("button", { type: "button", class: "chip", onclick: function () {
+        var buka = !wadahBlok.querySelector("details.blok:not([open])") ? false : true;
+        Array.prototype.forEach.call(wadahBlok.querySelectorAll("details.blok"), function (d) { d.open = buka; });
+      } }, ikon("list", 16), "Buka semua");
+      if (!k && g.kategori.length > 1) chips.append(semuaChip);
       g.kategori.forEach(function (kat, i) {
         var cocokKat = k && u.norm(kat.nama).indexOf(k) >= 0;
         var daftar = kat.produk.filter(function (p) {
           return !k || cocokKat || u.norm(p.nama).indexOf(k) >= 0 || u.norm(p.termasuk).indexOf(k) >= 0;
         });
         if (!daftar.length) return;
-        var idBlok = "kat-" + i;
-        if (!k) {
-          chips.append(h("button", { type: "button", class: "chip", "aria-pressed": (!semua && pilihKat === i) ? "true" : "false", onclick: function () {
-            pilihKat = i; isi("");
-            var atas = wadahBlok.getBoundingClientRect().top + window.scrollY - 150;
-            if (window.scrollY > atas) window.scrollTo({ top: atas, behavior: u.kurangGerak() ? "auto" : "smooth" });
-          } }, ikon(ik.untukKategori(kat.nama), 16), kat.nama, h("span", { class: "chip-n", text: String(kat.produk.length) })));
-        } else {
-          chips.append(h("button", { type: "button", class: "chip", "data-ke": idBlok, "aria-current": "false", onclick: function () {
-            var el = document.getElementById(idBlok);
-            if (el) el.scrollIntoView({ behavior: u.kurangGerak() ? "auto" : "smooth", block: "start" });
-          } }, ikon(ik.untukKategori(kat.nama), 16), kat.nama));
-        }
-        if (!semua && pilihKat !== i) return;
         total += daftar.length;
-        wadahBlok.append(h("section", { class: "blok", id: idBlok, "aria-labelledby": idBlok + "-h" },
-          h("div", { class: "blok-kepala" },
+        var idBlok = "kat-" + i;
+        var mulai = opsiTermurah(daftar);
+        var d = h("details", { class: "blok", id: idBlok },
+          h("summary", { class: "blok-kepala" },
             h("span", { class: "blok-ikon" }, ikon(ik.untukKategori(kat.nama), 24)),
-            h("h2", { id: idBlok + "-h", text: kat.nama }),
-            h("span", { class: "blok-jumlah", text: daftar.length + " paket" })
+            h("span", { class: "blok-judul" },
+              h("h2", { text: kat.nama }),
+              h("span", { class: "blok-jumlah", text: daftar.length + " paket" + (mulai ? " · mulai " + teksMulai(mulai) : "") })
+            ),
+            h("span", { class: "blok-panah", "aria-hidden": "true" }, ikon("bawah", 20))
           ),
-          kat.ket ? h("p", { class: "catatan", text: kat.ket }) : null,
-          h("ul", { class: "menu" }, daftar.map(function (p, n) {
-            var cocokIsi = k && u.norm(p.nama).indexOf(k) < 0 && !cocokKat && u.norm(p.termasuk).indexOf(k) >= 0;
-            var li = itemEl(p, g, cocokIsi); li.setAttribute("style", "--i:" + n); return li;
-          }))
-        ));
+          h("div", { class: "blok-isi" },
+            kat.ket ? h("p", { class: "catatan", text: kat.ket }) : null,
+            h("ul", { class: "menu" }, daftar.map(function (p) {
+              var cocokIsi = k && u.norm(p.nama).indexOf(k) < 0 && !cocokKat && u.norm(p.termasuk).indexOf(k) >= 0;
+              return itemEl(p, g, kat, cocokIsi);
+            }))
+          )
+        );
+        d.open = !!k || !!terbuka[i];
+        d.addEventListener("toggle", function () { if (!k) terbuka[i] = d.open; });
+        wadahBlok.append(d);
+        chips.append(h("button", { type: "button", class: "chip", onclick: function () {
+          d.open = true;
+          d.scrollIntoView({ behavior: u.kurangGerak() ? "auto" : "smooth", block: "start" });
+        } }, ikon(ik.untukKategori(kat.nama), 16), kat.nama, h("span", { class: "chip-n", text: String(kat.produk.length) })));
       });
       if (!total) {
         wadahBlok.append(h("div", { class: "kosong" },
@@ -397,49 +408,25 @@
           h("p", { text: k ? "Coba kata lain, atau hapus pencarian untuk melihat semua paket." : "Daftar harga game ini belum diisi." })
         ));
       }
-      var aktifChip = chips.querySelector('[aria-pressed="true"]');
-      if (aktifChip) chips.scrollLeft = Math.max(0, aktifChip.offsetLeft - (chips.clientWidth - aktifChip.offsetWidth) / 2);
       info.textContent = k ? total + " paket ditemukan." : "";
-      if (k) pasangPengamat(); else if (pengamat) { pengamat.disconnect(); pengamat = null; }
-      pasangMuncul(Array.prototype.slice.call(wadahBlok.querySelectorAll(".blok")));
-    }
-
-    function pasangPengamat() {
-      if (pengamat) pengamat.disconnect();
-      if (!("IntersectionObserver" in window)) return;
-      var bloks = Array.prototype.slice.call(wadahBlok.querySelectorAll(".blok"));
-      if (!bloks.length) return;
-      function tandai(id) {
-        Array.prototype.forEach.call(chips.children, function (c) {
-          var aktif = c.getAttribute("data-ke") === id;
-          c.setAttribute("aria-current", aktif ? "true" : "false");
-          if (aktif && c.scrollIntoView) {
-            var kiri = c.offsetLeft - 16;
-            if (chips.scrollTo) chips.scrollTo({ left: kiri, behavior: u.kurangGerak() ? "auto" : "smooth" });
-          }
-        });
-      }
-      pengamat = new IntersectionObserver(function (entri) {
-        entri.forEach(function (e) { if (e.isIntersecting) tandai(e.target.id); });
-      }, { rootMargin: "-30% 0px -60% 0px" });
-      bloks.forEach(function (b) { pengamat.observe(b); });
-      tandai(bloks[0].id);
     }
 
     input.addEventListener("input", function () { isi(input.value); });
     isi("");
 
-    tampilan.replaceChildren(h("div", { class: "tampil" }, kepala, alat, info, wadahBlok));
+    var halaman = h("div", { class: "tampil" }, kepala, alat, info, wadahBlok);
+    bawahHalaman(halaman);
+    tampilan.replaceChildren(halaman);
   }
 
   /* ---------- Rute ---------- */
   function render(tanpaGulir) {
-    if (pengamat) { pengamat.disconnect(); pengamat = null; }
     var m = /^#\/game\/([a-z0-9-]+)\/?$/.exec(location.hash);
     if (tanpaGulir !== true) window.scrollTo(0, 0);
+    document.body.classList.toggle("di-game", !!m);
     if (m) {
       var g = daftarGame.find(function (x) { return x.slug === m[1]; });
-      if (g) { renderGame(g); return; }
+      if (g) { renderGame(g); fokusJudul(tanpaGulir); return; }
       document.title = "Game tidak ditemukan | " + C.NAMA_TOKO;
       tautanBalik.hidden = false;
       tampilan.replaceChildren(h("div", { class: "kosong", style: "margin-top:2rem" },
@@ -449,6 +436,14 @@
       return;
     }
     renderBeranda();
+    fokusJudul(tanpaGulir);
+  }
+  var pertama = true;
+  function fokusJudul(tanpaGulir) {
+    if (pertama) { pertama = false; return; }
+    if (tanpaGulir === true) return;
+    var j = tampilan.querySelector("h1");
+    if (j) { j.setAttribute("tabindex", "-1"); j.focus({ preventScroll: true }); }
   }
 
   function mulai() {
