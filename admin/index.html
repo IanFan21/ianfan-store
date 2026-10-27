@@ -15,10 +15,10 @@
 <script src="../assets/js/lib/tema.js?v=10"></script>
 <link rel="stylesheet" href="../assets/css/style.css?v=10">
 <link rel="stylesheet" href="../assets/css/tema.css?v=10">
-</head>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script></head>
 <body class="halaman-admin">
 <canvas id="latar" aria-hidden="true"></canvas>
-<a class="lewati" href="#isi">Lewati ke isi</a>
+<a class="lewati" href="#isi">Lewati ke isi  </a>
 
 <header class="kepala">
   <div class="wadah kepala-isi">
@@ -47,7 +47,7 @@
       <form id="form-masuk" novalidate>
         <div class="isian"><label for="email">Email</label><input id="email" type="email" autocomplete="username" required></div>
         <div class="isian"><label for="sandi">Kata sandi</label><input id="sandi" type="password" autocomplete="current-password" required></div>
-        <button class="btn btn--amber" type="submit" id="btn-masuk">Masuk</button>
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAAFnaJ7AKs7PgcK1v"></div>         <button class="btn btn--amber" type="submit" id="btn-masuk">Masuk</button>
         <p class="galat-p" id="galat-masuk" role="alert"></p>
       </form>
     </section>
