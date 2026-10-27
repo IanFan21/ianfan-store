@@ -129,7 +129,7 @@
     dlgPesan.replaceChildren(
       h("h2", { id: "dlg-pesan-h", text: "Pesan lewat mana?" }),
       h("p", { class: "pesan-ringkas" }, "Paket ", h("strong", { text: p.nama }), opsi.length === 1 ? " · " + u.teksHarga(opsi[0]) : ""),
-      grupOpsi, pilihan,
+      grupOpsi || document.createDocumentFragment(), pilihan,
       h("p", { class: "pesan-catatan", text: "Isi UID dan server di chat. Harga final, estimasi waktu, dan cara bayar dikonfirmasi admin sebelum pengerjaan." }),
       tutup
     );
