@@ -1,0 +1,47 @@
+# Keep-alive Supabase gratis untuk IanFan Store.
+# Tidak butuh Secret: URL + anon key dibaca dari assets/js/config/config.js
+# yang sudah ada di repo ini (anon key memang dirancang publik untuk browser).
+# Jangan pernah menaruh service_role key di workflow ini.
+# Batas jujur: ini bukan jaminan resmi Supabase. Paket berbayar yang
+# tidak di-pause. Kalau proyek sudah terlanjur paused, workflow ini
+# akan merah sampai proyek di-Resume manual dari dashboard Supabase.
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    - cron: "17 0 * * *" # tiap hari 00:17 UTC / 07:17 WIB
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ping database Supabase
+        run: |
+          python3 - <<'PY'
+          import re, urllib.request
+          from urllib.parse import urlparse
+
+          with open("assets/js/config/config.js", encoding="utf-8") as f:
+              cfg = f.read()
+          url = re.search(r'SUPABASE_URL\s*:\s*"([^"]+)"', cfg)
+          key = re.search(r'SUPABASE_ANON_KEY\s*:\s*"([^"]+)"', cfg)
+          if not url or not key or not url.group(1) or not key.group(1):
+              raise SystemExit("SUPABASE_URL / SUPABASE_ANON_KEY kosong di config.js. Isi dulu, lalu jalankan ulang.")
+          base = url.group(1).rstrip("/")
+          print("Ping ke:", urlparse(base).hostname)
+          req = urllib.request.Request(
+              base + "/rest/v1/produk?select=id&limit=1",
+              headers={"apikey": key.group(1), "Authorization": "Bearer " + key.group(1)},
+          )
+          with urllib.request.urlopen(req, timeout=30) as res:
+              body = res.read()
+              print("HTTP", res.status, "| baris diterima:", len(body), "byte")
+              if res.status != 200:
+                  raise SystemExit(f"HTTP {res.status}")
+          print("Keep-alive OK")
+          PY
