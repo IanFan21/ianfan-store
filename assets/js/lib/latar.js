@@ -72,8 +72,7 @@
     t += 0.0075;
     gambar();
   }
-  var sentuh = window.matchMedia && matchMedia("(hover: none), (pointer: coarse), (max-width: 48rem)").matches;
-  function jalan() { if (!raf && !kurang && !sentuh) raf = requestAnimationFrame(putar); }
+  function jalan() { if (!raf && !kurang) raf = requestAnimationFrame(putar); }
   function henti() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
 
   if (ctx) {
