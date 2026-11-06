@@ -236,6 +236,11 @@
 
   /* ---------- Halaman game ---------- */
   var cacahIsi = 0;
+  /* Panel "isi paket" yang dibuka pengunjung: dipertahankan saat daftar
+     digambar ulang (mis. segar data latar), supaya ketukan tidak hilang
+     dan tampilan tidak berkedip saat daftar dibangun ulang. */
+  var isiDibuka = {};
+  function kunciIsi(p) { return p.id || p.nama; }
   function itemEl(p, g, kat, bukaIsi) {
     var opsi = p.harga || [];
     var habis = p.tersedia === false;
@@ -270,6 +275,7 @@
         tb.setAttribute("aria-expanded", buka ? "true" : "false");
         tb.querySelector(".isi-teks").textContent = buka ? "Tutup isi paket" : "Apa saja isinya?";
         panel.hidden = !buka;
+        isiDibuka[kunciIsi(p)] = buka;
       });
       aksi.append(tb);
     }
@@ -390,7 +396,7 @@
             kat.ket ? h("p", { class: "catatan", text: kat.ket }) : null,
             h("ul", { class: "menu" }, daftar.map(function (p) {
               var cocokIsi = k && u.norm(p.nama).indexOf(k) < 0 && !cocokKat && u.norm(p.termasuk).indexOf(k) >= 0;
-              return itemEl(p, g, kat, cocokIsi);
+              return itemEl(p, g, kat, cocokIsi || !!isiDibuka[kunciIsi(p)]);
             }))
           )
         );
